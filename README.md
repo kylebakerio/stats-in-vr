@@ -1,13 +1,13 @@
 # features
 - get stats component data in VR, while you're actually using your app
-- high performance, just one canvas texture for all stats (each though each graph is its own canvas)
-- uses existing stats component under the hood
-- pick which stats you want to track
+- high performance, just one canvas/image draw-call texture for all stats (though each graph is its own canvas/image/draw-call, if you include those)
+- uses existing stats component under the hood, so same numbers, no re-inventing the wheel
+- pick which stats you want to track, reduce clutter
 - throttle to as smooth or as performance sensitive as you want
 - pick background color, opacity
-- include some, all, or no charts
-- attach to camera by default, but attach anywhere you want
-- default behavior is to display when enter-vr, and hide and show `stats` when exit-vr, but behavior can be customized
+- include some, all, or no graphs
+- attach to camera by default, but can attach anywhere in-scene you want
+- default behavior is to display when enter-vr, and hide and show `stats` when exit-vr, but behavior can be specified with options
 - easy-peasy
 
 ## yet another necro component pulled into service
