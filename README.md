@@ -11,7 +11,7 @@
 - default behavior is to display when enter-vr, and hide and show `stats` when exit-vr, but behavior can be specified with options
 - set targets for maximum or minimum stats values, which will cause numbers to be red or green accordingly
 - by default, shows all stats and graphs and has some opacity, and some default target values for the major stats
-- if you prefer the lightest weight option instead, just set performancemode='true;'
+- if you prefer the lightest weight option instead, just set `performancemode='true;'` and `showlabels:fps,raf;` (or exactly whatever stats you want to track).
 
 ## yet another necro component pulled into service
 
