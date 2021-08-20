@@ -25,8 +25,6 @@ You can access it through jsdelivr's cdn here: https://cdn.jsdelivr.net/gh/kyleb
 stats-in-vr component for [A-Frame](https://aframe.io).
 
 ![stats-in-vr](https://user-images.githubusercontent.com/6391152/130007970-a512c190-0a4e-4f0d-8c40-0d8e1e9e58e8.png)
-![pick-graphs](https://user-images.githubusercontent.com/6391152/130017676-8de7e02b-268e-4896-89cb-3006e5a8dd58.png)
-
 ![orange](https://user-images.githubusercontent.com/6391152/130179324-d68f276d-1ccf-4f7c-90fc-1a872bb4fe61.png)
 ![some-graphs-only](https://user-images.githubusercontent.com/6391152/130179339-85f94d50-414a-43ae-b9c7-53304a245921.png)
 ![allgraphs-opacity](https://user-images.githubusercontent.com/6391152/130179350-8eac1d93-beda-4175-aa1b-7d6ecb829e61.png)
