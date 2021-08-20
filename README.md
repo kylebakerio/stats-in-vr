@@ -27,7 +27,27 @@ stats-in-vr component for [A-Frame](https://aframe.io).
 ![some-graphs-only](https://user-images.githubusercontent.com/6391152/130179339-85f94d50-414a-43ae-b9c7-53304a245921.png)
 ![allgraphs-opacity](https://user-images.githubusercontent.com/6391152/130179350-8eac1d93-beda-4175-aa1b-7d6ecb829e61.png)
 
+
+
 ## Examples
+
+### Installation
+
+#### Browser
+
+Install and use by directly including the [browser file](https://cdn.jsdelivr.net/gh/kylebakerio/stats-in-vr@1.3.0/stats-in-vr.js):
+
+```html
+<head>
+  <title>My A-Frame Scene</title>
+  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/kylebakerio/stats-in-vr@1.3.0/stats-in-vr.js"></script>
+</head>
+
+<body>
+  <a-scene stats-in-vr></a-scene>
+</body>
+```
 
 ### default behavior:
 when you enter VR, full stats get attached to your face, about half a meter down and forward from you. When you are not in VR, you see the normal 2d stats.
@@ -67,20 +87,18 @@ when you enter VR, full stats get attached to your face, about half a meter down
 
 ### attach translucent stats to your left hand when you enter vr:
 ```html
-    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/kylebakerio/stats-in-vr@1.2.2/stats-in-vr.js"></script>
 
     <a-scene stats-in-vr="anchorel:#left-hand; position:0 -.5 0; fillstyle:rgba(255, 255, 255, 0.5);">
-      <a-entity id="rig" movement-controls="fly:true;" position="0 0 0">
-        <a-entity camera position="0 1.6 0" look-controls>
-        </a-entity>
-        <a-entity id="left-hand" hand-controls="hand: left"></a-entity>
-        <a-entity hand-controls="hand: right"></a-entity>
+      <a-entity id="rig" position="0 0 0">
+        <a-camera camera position="0 1.6 0" look-controls></a-camera>
+        <a-entity hand-controls="hand: left" id="left-hand"></a-entity>
+        <a-entity hand-controls="hand: right">              </a-entity>
       </a-entity>
     </a-scene>
 ```
 
-### make it a permanent fixture in your scene, vr or not:
+### make the stats panel a fixed item in your scene's space, remaining there whether in vr or not:
 stick a VR panel somewhere you want in the scene, and make it stay there, whether you're in VR or not.
 ```html
 <a-scene stats-in-vr="anchorel:#the-box;position:0 .4 0; alwaysshow3dstats:true; show2dstats:false;" >
@@ -155,21 +173,5 @@ https://glitch.com/edit/#!/stats-in-vr?path=index.html%3A17%3A30
     }
 ```
 
-### Installation
 
-#### Browser
-
-Install and use by directly including the [browser file](https://cdn.jsdelivr.net/gh/kylebakerio/stats-in-vr@1.3.0/stats-in-vr.js):
-
-```html
-<head>
-  <title>My A-Frame Scene</title>
-  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/kylebakerio/stats-in-vr@1.3.0/stats-in-vr.js"></script>
-</head>
-
-<body>
-  <a-scene stats-in-vr></a-scene>
-</body>
-```
 
