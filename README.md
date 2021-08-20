@@ -4,26 +4,20 @@
 - uses existing stats component under the hood, so same numbers, no re-inventing the wheel
 - pick which stats you want to track, reduce clutter
 - throttle to as smooth or as performance sensitive as you want
-- pick background color, opacity
+- pick background color, including optional opacity
 - include some, all, or no graphs
 - attach to camera by default, but can attach anywhere in-scene you want
 - default behavior is to display when enter-vr, and hide and show `stats` when exit-vr, but behavior can be specified with options
-- easy-peasy
+- set targets for maximum or minimum stats values, which will cause numbers to be red or green accordingly
+- by default, shows all stats and graphs and has some opacity, and some default target values for the major stats
+- if you prefer the lightest weight option instead, just set performancemode='true;'
 
 ## yet another necro component pulled into service
 
-This one is revived from back in the olden days! A-Frame 0.4.0 is close to as old as I've seen (pretty sure I have pulled a library somewhere that had a demo on 0.3.0?). Very cool that this 5 year old code can still be called into service.
-
 I've wanted this for a while, but I googled, found this, and then found what looked like a [promising pull request](https://github.com/chenzlabs/stats-in-vr/pull/1
-).
+). It hadn't been touched in 5 years, so I've spent some time updating it, improving it, making it faster, lighter, and adding features.
 
-Which, with just one tiny bug fix, was found to work even on A-Frame 1.2.0!
-
-~~though it seems the bars may not be working properly and that they perhaps used to. perhaps some more tinkering is in order?~~ Got the bars working again. :D Also spent a few hours going over it, refactoring stuff in the process. ~~I now realize it adds about 40-50 draw calls or so, because it works by adding a ton of images with canvas with text as textures for every value.~~ NM, fixed that too. Now all text stats are rendered as one buttery smooth image with canvas texture.
-
-I spent time working on the code, but not yet the repo. It's got all the usual boilerplate, now fallen way out of date. I just use the 'stats-in-vr.js' file and ignore the rest for now, may clean up rest of repo later. 
-
-You can access it through jsdelivr's cdn here: https://cdn.jsdelivr.net/gh/kylebakerio/stats-in-vr@1.1.0/stats-in-vr.js
+You can access it through jsdelivr's cdn here: https://cdn.jsdelivr.net/gh/kylebakerio/stats-in-vr@1.3.0/stats-in-vr.js
 
 **AGAIN, Note that the build/dist files are NOT up to date with this one file listed above--they wouldn't build because of the ES6 syntax used in my bug fix, and the build tools are just that old.**
 
@@ -41,19 +35,34 @@ when you enter VR, full stats get attached to your face, about half a meter down
 <a-scene stats-in-vr></a-scene>
 ```
 
-### just want fps and tirangles, including their graphs
+### just want fps and triangles and raf, and graphs for all but triangles
 ```html
-<a-scene stats-in-vr="showlabels:fps,triangles; showgraphs:fps,triangles"></a-scene>
+<a-scene stats-in-vr="showlabels:fps,raf,triangles; showgraphs:fps,raf"></a-scene>
 ```
 
 ### no graphs, just numbers please
 ```html
-<a-scene stats-in-vr="showallgraphs:false"></a-scene>
+<a-scene stats-in-vr="showgraphs:null;"></a-scene>
+```
+
+### high performance mode defaults?
+```html
+<a-scene stats-in-vr="performancemode:true;"></a-scene>
+```
+
+### no targets
+```html
+<a-scene stats-in-vr="targetMax:{};targetMin:{}"></a-scene>
+```
+
+### custom targets
+```html
+<a-scene stats-in-vr='targetMin:{"fps":59};targetMax:{"raf":30}'></a-scene>
 ```
 
 ### only fps graph, but all numbers
 ```html
-<a-scene stats-in-vr="showgraphs:fps;showalllabels:true"></a-scene>
+<a-scene stats-in-vr="showgraphs:fps;"></a-scene>
 ```
 
 ### attach translucent stats to your left hand when you enter vr:
@@ -61,7 +70,7 @@ when you enter VR, full stats get attached to your face, about half a meter down
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/kylebakerio/stats-in-vr@1.2.2/stats-in-vr.js"></script>
 
-    <a-scene stats-in-vr="anchorel:#left-hand; position:0 -.5 0;showallgraphs:true;fillstyle:rgba(255, 255, 255, 0.5);">
+    <a-scene stats-in-vr="anchorel:#left-hand; position:0 -.5 0; fillstyle:rgba(255, 255, 255, 0.5);">
       <a-entity id="rig" movement-controls="fly:true;" position="0 0 0">
         <a-entity camera position="0 1.6 0" look-controls>
         </a-entity>
@@ -86,35 +95,72 @@ https://glitch.com/edit/#!/stats-in-vr?path=index.html%3A17%3A30
 ## params
 ```js
 
-  schema: {
-    enabled: { type: "boolean", default: true },
+ enabled: { type: "boolean", default: true },
     debug: { type: "boolean", default: false },
+    
     position: { type: "string", default: "0 -1.1 -1" },
     rotation: { type: "string", default: "-20 0 0" },
     scale: { type: "string", default: "1 .8 1" },
-    throttle: { type: "number", default: 20 },
-    fillstyle: { type:"color", default: "white"}, // for opacity, you can try "rgba(255, 255, 255, 0.5)"
-    show2dstats: { type: "boolean", default: true },  // show the built-in 'stats' component
-    alwaysshow3dstats: { type: "boolean", default: false },  // show the built-in 'stats' component
+    
+    performancemode: { type: "boolean", default: false }, // set of defaults to focus on making it as light of impact as possible
+    throttle: { type: "number", default: 50 }, // how many ms between recalc, has biggest effect on performance (try it out for yourself! hah)
+    
+    backgroundcolor: { type:"color", default: "rgba(255, 255, 255, 0.5)"}, // you can specify solid colors to be slightly more performant
+    
+    show2dstats: { type: "boolean", default: true },  // show the built-in 'stats' component when not in VR
+    alwaysshow3dstats: { type: "boolean", default: false },  // show this component even when not in VR
     anchorel: { type: "selector", default: "[camera]" }, // anchor in-vr stats to something other than the camera
-    showalllabels: { type: "boolean", default: true }, 
-    showlabels: {type: 'array', default:[]}, // e.g., ['raf','fps','calls','entities']
-    showallgraphs: { type: "boolean", default: true },
-    showgraphs: {type: 'array', default:[]}, // e.g., ['raf','fps','calls','entities']
-  },
+    
+    showlabels: {type: 'array', default:['raf','fps','geometries','programs','textures','calls','triangles','points','entities','load']}, // please give all inputs in lowercase
+    showgraphs: {type: 'array', default:['raf','fps','geometries','programs','textures','calls','triangles','points','entities','load']}, // this will be auto-filtered down to match above, but you can filter down further if you want, say, 4 values in text, but only 1 in graph form. you can also select `null` or `false` or `[]` to turn off all graphs.
+    
+    targetMax: {
+      default: JSON.stringify({
+        Calls: 200, // 
+        raf: 15, // needed to keep responsiveness around 60fps
+        Triangles: 100000,
+        // you can specify your own targets for any stats props, and they'll turn red when they rise above target
+        // this does come with a small performance penalty
+      }),
+      capLabels: ['geometries','programs','textures','calls','triangles','points','entities','load'], // these props are auto-uppercased once for faster processing in tick handler
+      parse: json => {
+        const output = typeof json === "string" ? JSON.parse(json) : json; 
+        Object.keys(output).forEach(label => {
+          output[capitalizeWord(label)] = output[label]
+        })
+        return output;
+      },
+      stringify: JSON.stringify
+    },
+    targetMin: {// inverse of targetMax, for values where lower is better
+      default: JSON.stringify({
+        fps: 75,
+        // you can specify targets for any stats props, and they'll turn red when they fall below target
+        // this does come with a small performance penalty
+      }),
+      capLabels: ['geometries','programs','textures','calls','triangles','points','entities','load'], // these props are auto-uppercased once for faster processing in tick handler
+      parse: json => {
+        const output = typeof json === "string" ? JSON.parse(json) : json; 
+        Object.keys(output).forEach(label => {
+          output[capitalizeWord(label)] = output[label]
+        })
+        return output;
+      },
+      stringify: JSON.stringify
+    }
 ```
 
 ### Installation
 
 #### Browser
 
-Install and use by directly including the [browser file](https://cdn.jsdelivr.net/gh/kylebakerio/stats-in-vr@1.2.2/stats-in-vr.js):
+Install and use by directly including the [browser file](https://cdn.jsdelivr.net/gh/kylebakerio/stats-in-vr@1.3.0/stats-in-vr.js):
 
 ```html
 <head>
   <title>My A-Frame Scene</title>
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/kylebakerio/stats-in-vr@1.2.2/stats-in-vr.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/kylebakerio/stats-in-vr@1.3.0/stats-in-vr.js"></script>
 </head>
 
 <body>
