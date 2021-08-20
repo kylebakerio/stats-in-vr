@@ -97,7 +97,7 @@ https://glitch.com/edit/#!/stats-in-vr?path=index.html%3A17%3A30
 ## params
 ```js
 
- enabled: { type: "boolean", default: true },
+    enabled: { type: "boolean", default: true },
     debug: { type: "boolean", default: false },
     
     position: { type: "string", default: "0 -1.1 -1" },
@@ -116,11 +116,16 @@ https://glitch.com/edit/#!/stats-in-vr?path=index.html%3A17%3A30
     showlabels: {type: 'array', default:['raf','fps','geometries','programs','textures','calls','triangles','points','entities','load']}, // please give all inputs in lowercase
     showgraphs: {type: 'array', default:['raf','fps','geometries','programs','textures','calls','triangles','points','entities','load']}, // this will be auto-filtered down to match above, but you can filter down further if you want, say, 4 values in text, but only 1 in graph form. you can also select `null` or `false` or `[]` to turn off all graphs.
     
+    // targetMax
+    // targetMin
+    // ^ these two are defined below as custom schema options--basically, they take in JSON (if serializing or if defining in HTML, see examples) or straight up JS objects (if adding to scene programatically)
+    // thrown in are some sane defaults. This library is written/expects all stats to be given in lowercase everywhere, they will be uppercased as needed.
+
     targetMax: {
       default: JSON.stringify({
-        Calls: 200, // 
+        calls: 200, // 
         raf: 15, // needed to keep responsiveness around 60fps
-        Triangles: 100000,
+        triangles: 100000,
         // you can specify your own targets for any stats props, and they'll turn red when they rise above target
         // this does come with a small performance penalty
       }),
