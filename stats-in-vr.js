@@ -23,8 +23,8 @@ AFRAME.registerComponent("stats-in-vr", {
     
     backgroundcolor: { type:"color", default: "rgba(255, 255, 255, 0.5)"}, // you can specify solid colors to be slightly more performant
     
-    show2dstats: { type: "boolean", default: true },  // show the built-in 'stats' component
-    alwaysshow3dstats: { type: "boolean", default: false },  // show the built-in 'stats' component
+    show2dstats: { type: "boolean", default: true },  // show the built-in 'stats' component when not in VR
+    alwaysshow3dstats: { type: "boolean", default: false },  // show this component even when not in VR
     anchorel: { type: "selector", default: "[camera]" }, // anchor in-vr stats to something other than the camera
     
     showlabels: {type: 'array', default:['raf','fps','geometries','programs','textures','calls','triangles','points','entities','load']}, // please give all inputs in lowercase
@@ -133,13 +133,6 @@ AFRAME.registerComponent("stats-in-vr", {
     );
     this.data.anchorel.appendChild(this.statspanel);
     
-    if (this.data.alwaysshow3dstats || this.inVR) {
-      this.show();
-    }
-    else if (!this.inVR) {
-      this.hide();
-    }
-    
     if (this.data.debug) {
       // put our canvas where it is visible to observe without being put in 3d space, instead of somewhere it can't be seen.
       this.sceneEl.components.stats.statsEl.appendChild(this.canvasParent);
@@ -148,8 +141,14 @@ AFRAME.registerComponent("stats-in-vr", {
       document.body.appendChild(this.canvasParent);
     }
     
-    await this.getCanvases();
+    await this.setupData();
     this.tick = AFRAME.utils.throttleTick(this.willtick, this.data.throttle, this);
+    if (this.data.alwaysshow3dstats || this.inVR) {
+      this.show();
+    }
+    else if (!this.inVR) {
+      this.hide();
+    }
   },
   
   waitForTime: async function(ms) {
@@ -158,8 +157,8 @@ AFRAME.registerComponent("stats-in-vr", {
     })
   },
   
-  getCanvases: async function() {
-    if (this.data.debug) console.warn("calling getCanvases")
+  setupData: async function() {
+    if (this.data.debug) console.warn("calling setupData")
     // method:
     // store stat labels
     // store stat values
@@ -174,7 +173,7 @@ AFRAME.registerComponent("stats-in-vr", {
     if (!document.querySelectorAll(".rs-canvas").length) {
       if (this.data.debug) console.log("no canvases, recurse in ", 100)
       await this.waitForTime(100)
-      return await this.getCanvases()
+      return await this.setupData()
     }
 
     this.trackedvalues = [];
@@ -214,12 +213,13 @@ AFRAME.registerComponent("stats-in-vr", {
           console.warn("will not show graph without matching label",this.rsid)
           continue
         } // else
-        if (this.data.debug) console.log("include graph", i, this.rsid)        
-        this.yval = (1.3 - (this.labelOrder ) * 0.025);
+        this.yval = ( ( (1.25 - (.0125*(this.data.showlabels.length-1))) + ((this.data.showlabels.length-1) * .025) ) - (this.labelOrder * 0.025));
+        // this.yval = ( 1.25 + (this.data.showlabels.length * .0125) )
+        if (this.data.debug) console.log("include graph", this.trackedvalues.length, i, this.rsid,this.yval,this.labelOrder)        
         this.stats[i] = document.createElement('a-image'); // aframe VR image that will have the DOM's graph canvas given as texture
         this.stats[i].setAttribute('position', {x:-0.08, y:this.yval, z:0});
-        this.stats[i].setAttribute('width', '0.34');
-        this.stats[i].setAttribute('height', '0.025');
+        this.stats[i].setAttribute('width', 0.34);
+        this.stats[i].setAttribute('height', 0.025);
         this.stats[i].setAttribute('id', this.rsid + '-reflector');
         this.stats[i].setAttribute('src', '#' + this.rscanvases[i].id);
         this.statspanel.appendChild(this.stats[i]);
@@ -244,10 +244,10 @@ AFRAME.registerComponent("stats-in-vr", {
 
   update: function(olddata) {
     if (!this.statspanel) {
-      console.warn("update return?",olddata,this.data)
+      console.warn("skip initial update",olddata,this.data)
       return;
     } else {
-      console.warn("update no skip",olddata,this.data)
+      console.warn("non-skipped update",olddata,this.data)
     }
     this.haveTargets = !!Object.keys(this.data.targets).length;
     this.statspanel.setAttribute("position", this.data.position);
