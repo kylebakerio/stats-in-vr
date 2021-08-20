@@ -27,8 +27,8 @@ AFRAME.registerComponent("stats-in-vr", {
     alwaysshow3dstats: { type: "boolean", default: false },  // show this component even when not in VR
     anchorel: { type: "selector", default: "[camera]" }, // anchor in-vr stats to something other than the camera
     
-    showlabels: {type: 'array', default:['raf','fps','geometries','programs','textures','calls','triangles','points','entities','load']}, // please give all inputs in lowercase
-    showgraphs: {type: 'array', default:['raf','fps','geometries','programs','textures','calls','triangles','points','entities','load']}, // this will be auto-filtered down to match above, but you can filter down further if you want, say, 4 values in text, but only 1 in graph form. you can also select `null` or `false` or `[]` to turn off all graphs.
+    showlabels: {type: 'array', default:['raf','fps','geometries','programs','textures','calls','triangles','points','entities','load time']}, // please give all inputs in lowercase
+    showgraphs: {type: 'array', default:['raf','fps','geometries','programs','textures','calls','triangles','points','entities','load time']}, // this will be auto-filtered down to match above, but you can filter down further if you want, say, 4 values in text, but only 1 in graph form. you can also select `null` or `false` or `[]` to turn off all graphs.
     
     targetMax: {
       default: JSON.stringify({
@@ -206,6 +206,8 @@ AFRAME.registerComponent("stats-in-vr", {
         if (this.data.debug) console.log("include label", i, this.rsid)
         this.labelOrder = this.data.showlabels.findIndex(label => this.rsid.toLowerCase().includes(label));
         this.trackedvalues[this.labelOrder] = i;
+      } else if (this.data.debug) {
+        console.log("will not show", this.rsid)
       }
 
       if (this.data.showallgraphs || this.data.showgraphs.includes(this.rsid.toLowerCase())) {
@@ -215,7 +217,7 @@ AFRAME.registerComponent("stats-in-vr", {
         } // else
         this.yval = ( ( (1.25 - (.0125*(this.data.showlabels.length-1))) + ((this.data.showlabels.length-1) * .025) ) - (this.labelOrder * 0.025));
         // this.yval = ( 1.25 + (this.data.showlabels.length * .0125) )
-        if (this.data.debug) console.log("include graph", this.trackedvalues.length, i, this.rsid,this.yval,this.labelOrder)        
+        if (this.data.debug) console.log("include graph", i, this.trackedvalues.length, this.rsid,this.yval,this.labelOrder)        
         this.stats[i] = document.createElement('a-image'); // aframe VR image that will have the DOM's graph canvas given as texture
         this.stats[i].setAttribute('position', {x:-0.08, y:this.yval, z:0});
         this.stats[i].setAttribute('width', 0.34);
