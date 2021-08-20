@@ -1,3 +1,4 @@
+
 # features
 - get stats component data in VR, while you're actually using your app
 - high performance, just one canvas/image draw-call texture for all stats (though each graph is its own canvas/image/draw-call, if you include those)
@@ -26,6 +27,9 @@ stats-in-vr component for [A-Frame](https://aframe.io).
 ![stats-in-vr](https://user-images.githubusercontent.com/6391152/130007970-a512c190-0a4e-4f0d-8c40-0d8e1e9e58e8.png)
 ![pick-graphs](https://user-images.githubusercontent.com/6391152/130017676-8de7e02b-268e-4896-89cb-3006e5a8dd58.png)
 
+![orange](https://user-images.githubusercontent.com/6391152/130179324-d68f276d-1ccf-4f7c-90fc-1a872bb4fe61.png)
+![some-graphs-only](https://user-images.githubusercontent.com/6391152/130179339-85f94d50-414a-43ae-b9c7-53304a245921.png)
+![allgraphs-opacity](https://user-images.githubusercontent.com/6391152/130179350-8eac1d93-beda-4175-aa1b-7d6ecb829e61.png)
 
 ## Examples
 
@@ -83,7 +87,7 @@ when you enter VR, full stats get attached to your face, about half a meter down
 ### make it a permanent fixture in your scene, vr or not:
 stick a VR panel somewhere you want in the scene, and make it stay there, whether you're in VR or not.
 ```html
-<a-scene stats-in-vr="anchorel:#the-box;position:0 .4 0;showallgraphs:true; alwaysshow3dstats:true; show2dstats:false;" >
+<a-scene stats-in-vr="anchorel:#the-box;position:0 .4 0; alwaysshow3dstats:true; show2dstats:false;" >
      <a-circle id="floor" rotation="-90 0 0" radius="400" color="#7BC8A4"></a-circle>
      <a-box id="the-box" position="-1 0.5 -6" rotation="0 45 0" color="red"></a-box>
 </a-scene>
