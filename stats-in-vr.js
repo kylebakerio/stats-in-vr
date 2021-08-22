@@ -40,6 +40,7 @@ AFRAME.registerComponent("stats-in-vr", {
         calls: 200, // 
         raf: 15, // needed to keep responsiveness around 60fps
         triangles: 100000,
+        load: 3000,
         // you can specify your own targets for any stats props, and they'll turn red when they rise above target
         // this does come with a small performance penalty
       }),
@@ -49,6 +50,7 @@ AFRAME.registerComponent("stats-in-vr", {
         Object.keys(output).forEach(label => {
           output[capitalizeWord(label)] = output[label]
         })
+        output['Load Time'] = output['Load Time'] || output['load time'] || output['load']; // || output['loadtime'] || output['load_time'] || output['Load'] || output['Load time'] || output['load-time'] ||
         return output;
       },
       stringify: JSON.stringify
@@ -65,6 +67,7 @@ AFRAME.registerComponent("stats-in-vr", {
         Object.keys(output).forEach(label => {
           output[capitalizeWord(label)] = output[label]
         })
+        output['Load Time'] = output['Load Time'] || output['load time'] || output['load']; // || output['loadtime'] || output['load_time'] || output['Load'] || output['Load time'] || output['load-time'] ||
         return output;
       },
       stringify: JSON.stringify
