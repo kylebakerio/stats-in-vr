@@ -209,7 +209,10 @@ AFRAME.registerComponent("stats-in-vr", {
       this.idsuffix = this.rsids[i].replace(" ", "_");
       this.rscanvases[i].id = "rstats-" + this.idsuffix;
       
-      if (this.data.showalllabel || this.data.showlabels.includes(this.rsid.toLowerCase())) {
+      const checkIfTrackedLabel = this.rsid.toLowerCase().split(" ")[0]
+      
+      console.log(this.rsid.toLowerCase(), this.idsuffix, checkIfTrackedLabel, this.data.showlabels.includes(checkIfTrackedLabel))
+      if (this.data.showlabels.includes(checkIfTrackedLabel)) {
         if (this.data.debug) console.log("include label", i, this.rsid)
         this.labelOrder = this.data.showlabels.findIndex(label => this.rsid.toLowerCase().includes(label));
         this.trackedvalues[this.labelOrder] = i;
@@ -217,7 +220,7 @@ AFRAME.registerComponent("stats-in-vr", {
         console.log("will not show", this.rsid)
       }
 
-      if (this.data.showallgraphs || this.data.showgraphs.includes(this.rsid.toLowerCase())) {
+      if (this.data.showgraphs.includes(this.rsid.toLowerCase())) {
         if (this.data.debug && !this.data.showlabels.includes(this.rsid.toLowerCase())) {
           console.warn("will not show graph without matching label",this.rsid)
           continue
