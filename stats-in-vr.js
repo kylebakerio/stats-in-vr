@@ -27,14 +27,19 @@ AFRAME.registerComponent("stats-in-vr", {
     alwaysshow3dstats: { type: "boolean", default: false },  // show this component even when not in VR
     anchorel: { type: "selector", default: "[camera]" }, // anchor in-vr stats to something other than the camera
     
-    showlabels: {type: 'array', default:['raf','fps','geometries','programs','textures','calls','triangles','points','entities','load time']}, // please give all inputs in lowercase
-    showgraphs: {type: 'array', default:['raf','fps','geometries','programs','textures','calls','triangles','points','entities','load time']}, // this will be auto-filtered down to match above, but you can filter down further if you want, say, 4 values in text, but only 1 in graph form. you can also select `null` or `false` or `[]` to turn off all graphs.
+    showlabels: {type: 'array', default:['raf','fps','geometries','programs','textures','calls','triangles','points','entities','load']}, // please give all inputs in lowercase
+    showgraphs: {type: 'array', default:['raf','fps','geometries','programs','textures','calls','triangles','points','entities','load']}, // this will be auto-filtered down to match above, but you can filter down further if you want, say, 4 values in text, but only 1 in graph form. you can also select `null` or `false` or `[]` to turn off all graphs.
     
+    // targetMax
+    // targetMin
+    // ^ these two are defined below as custom schema options--basically, they take in JSON (if serializing or if defining in HTML, see examples) or straight up JS objects (if adding to scene programatically)
+    // thrown in are some sane defaults. This library is written/expects all stats to be given in lowercase everywhere, they will be uppercased as needed.
+
     targetMax: {
       default: JSON.stringify({
-        Calls: 200, // 
+        calls: 200, // 
         raf: 15, // needed to keep responsiveness around 60fps
-        Triangles: 100000,
+        triangles: 100000,
         // you can specify your own targets for any stats props, and they'll turn red when they rise above target
         // this does come with a small performance penalty
       }),
@@ -68,14 +73,16 @@ AFRAME.registerComponent("stats-in-vr", {
   
   inVR: false,
   init: function() {
-    console.warn("init")
+    if (this.data.debug) {
+      console.warn("init stats-in-vr")
+    }
     this.haveTargets = !!(Object.keys(this.data.targetMax).length + Object.keys(this.data.targetMin).length)
     this.canvasParent = document.createElement('div');
     this.canvasParent.setAttribute('id','stats-in-vr-canvas-parent')
     this.sceneEl = AFRAME.scenes[0]
     
     if (this.data.performancemode) {
-      if (this.data.debug) console.warn("performance mode enabled, setting throttle, hiding graphs and 2d stats, grayscale, no targets")
+      if (this.data.debug) console.warn("performance mode enabled, setting throttle, hiding graphs and 2d stats, setting solid gray background, setting no targets; debug is on, it is recommended that you turn it off, as logs have a performance cost")
       this.data.throttle = 250
       this.data.showgraphs = []
       this.data.show2dstats = false
@@ -86,19 +93,19 @@ AFRAME.registerComponent("stats-in-vr", {
     AFRAME.scenes[0].addEventListener('enter-vr', async () => {
       this.inVR = true;
       if (this.data.enabled) {
-        console.warn("entered VR, showing stats")
+        if (this.data.debug) console.warn("entered VR, showing stats")
         this.show()
       } else if (this.data.debug) {
-        console.warn("not showing because disabled")
+        console.warn("stats-in-vr is not enabled")
       }
     })
     AFRAME.scenes[0].addEventListener('exit-vr', async () => {
       this.inVR = false;
       if (!this.data.alwaysshow3dstats) {
-        console.warn("hiding VR stats")
+        if (this.data.debug) console.warn("hiding VR stats")
         this.hide();
       } else {
-        console.warn("persistent 3d stats enabled, won't hide")
+        if (this.data.debug) console.warn("persistent 3d stats enabled, won't hide")
       }
     })
     
@@ -236,7 +243,7 @@ AFRAME.registerComponent("stats-in-vr", {
     this.canvasParent.appendChild(this.monoCanvas)
     
     this.monoImage = document.createElement("a-image");
-    this.monoImage.setAttribute("id", "aframe-all");
+    this.monoImage.setAttribute("id", "aframe-rstats-text");
     this.monoImage.setAttribute("position", {x:0.17, y:1.25, z:0});
     this.monoImage.setAttribute("width", .16);
     this.monoImage.setAttribute("height", .025 * this.trackedvalues.length);
@@ -245,16 +252,16 @@ AFRAME.registerComponent("stats-in-vr", {
   },
 
   update: function(olddata) {
-    if (!this.statspanel) {
+    if (!this.statspanel || !this.trackedvalues) {
       console.warn("skip initial update",olddata,this.data)
       return;
     } else {
       console.warn("non-skipped update",olddata,this.data)
     }
-    this.haveTargets = !!Object.keys(this.data.targets).length;
+    this.haveTargets = (this.data.targetMax || this.data.targetMin) && !!Object.keys(this.data.targetMax).length || !!Object.keys(this.data.targetMin).length;
     this.statspanel.setAttribute("position", this.data.position);
     this.statspanel.setAttribute("scale", this.data.scale);
-    this.tick = AFRAME.utils.throttleTick(this.willtick, this.data.throttle, this);
+    if (this.tick) this.tick = AFRAME.utils.throttleTick(this.willtick, this.data.throttle, this);
     return this.data.enabled ? this.show() : this.hide();
   },
 
