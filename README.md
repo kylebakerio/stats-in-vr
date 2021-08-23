@@ -1,3 +1,4 @@
+![sample-report-3](https://user-images.githubusercontent.com/6391152/130512748-a3dcea0c-38ff-4744-bf9a-54c23f3d85e5.png)
 
 # features
 - get stats component data in VR, while you're actually using your app
@@ -7,11 +8,12 @@
 - throttle to as smooth or as performance sensitive as you want
 - pick background color, including optional opacity
 - include some, all, or no graphs
-- attach to camera by default, but can attach anywhere in-scene you want
+- attaches to camera by default, but can attach anywhere in-scene you want
 - default behavior is to display when enter-vr, and hide and show `stats` when exit-vr, but behavior can be specified with options
 - set targets for maximum or minimum stats values, which will cause numbers to be red or green accordingly
 - by default, shows all stats and graphs and has some opacity, and some default target values for the major stats
 - if you prefer the lightest weight option instead, just set `performancemode='true;'` and `showlabels:fps,raf;` (or exactly whatever stats you want to track).
+- **track live performance and view in-VR reports on caverage/high/low within sample period at a sample rate you determine**
 
 ## yet another necro component pulled into service
 
@@ -26,6 +28,7 @@ stats-in-vr component for [A-Frame](https://aframe.io).
 ![orange](https://user-images.githubusercontent.com/6391152/130179324-d68f276d-1ccf-4f7c-90fc-1a872bb4fe61.png)
 ![some-graphs-only](https://user-images.githubusercontent.com/6391152/130179339-85f94d50-414a-43ae-b9c7-53304a245921.png)
 ![allgraphs-opacity](https://user-images.githubusercontent.com/6391152/130179350-8eac1d93-beda-4175-aa1b-7d6ecb829e61.png)
+![sample-report-2](https://user-images.githubusercontent.com/6391152/130513640-53b73d1c-ff60-40fb-94c4-0a5d014c9d46.png)
 
 
 
@@ -66,23 +69,53 @@ when you enter VR, full stats get attached to your face, about half a meter down
 ```
 
 ### high performance mode defaults?
+bare minimum makes for the lighest tick, producing the purest readings possible
 ```html
 <a-scene stats-in-vr="performancemode:true;"></a-scene>
 ```
 
 ### no targets
+improves performance
 ```html
-<a-scene stats-in-vr="targetMax:{};targetMin:{}"></a-scene>
+<a-scene stats-in-vr="targetmax:{};targetmin:{}"></a-scene>
 ```
 
 ### custom targets
 ```html
-<a-scene stats-in-vr='targetMin:{"fps":59};targetMax:{"raf":30}'></a-scene>
+<a-scene stats-in-vr='targetmin:{"fps":59};targetmax:{"raf":30}'></a-scene>
 ```
 
 ### only fps graph, but all numbers
 ```html
 <a-scene stats-in-vr="showgraphs:fps;"></a-scene>
+```
+
+### enable default auto-report (600 ticks after enter-vr, display for 30 seconds before disappearing)
+```html
+<a-scene stats-in-vr='samplereport:{"autostart":true};'></a-scene>
+```
+
+### start sampling manually
+```html
+<a-scene stats-on-click stats-in-vr>
+    <a-entity hand-controls="hand: left" id="left-hand"></a-entity>
+    <a-entity hand-controls="hand: right">              </a-entity>
+</a-scene>
+<script>
+  // when you pull the trigger with left hand
+  // see docs for hand-controls events: https://aframe.io/docs/1.2.0/components/hand-controls.html#sidebar
+  AFRAME.registerComponent('stats-on-click',{
+    init() {
+      document.querySelector('#left-hand').addEventListener('pointup', function (evt) { 
+         document.querySelector('[stats-in-vr]').components['stats-in-vr'].sample(200).then(() => {
+            document.querySelector('[stats-in-vr]').components['stats-in-vr'].showSampleCanvas(10000)
+         })
+      });
+    }
+  })
+  
+ 
+</script>
 ```
 
 ### attach translucent stats to your left hand when you enter vr:
