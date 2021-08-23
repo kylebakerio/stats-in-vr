@@ -187,6 +187,7 @@ AFRAME.registerComponent("stats-in-vr", {
     }
 
     this.trackedvalues = [];
+    this.trackedgraphs = [];
     this.rsids = [];
     this.rsvalues = [];
     this.stats = [];
@@ -222,28 +223,30 @@ AFRAME.registerComponent("stats-in-vr", {
       } else if (this.data.debug) {
         console.log("will not show", this.rsid)
       }
+      
 
       if (this.data.showgraphs.includes(this.rsid.toLowerCase())) {
         if (this.data.debug && !this.data.showlabels.includes(this.rsid.toLowerCase())) {
-          console.warn("will not show graph without matching label",this.rsid)
+          console.warn("will not show graph without matching label",this.rsid, this.rsid.toLowerCase())
           continue
         } // else
         this.yval = ( ( (1.25 - (.0125*(this.data.showlabels.length-1))) + ((this.data.showlabels.length-1) * .025) ) - (this.labelOrder * 0.025));
         // this.yval = ( 1.25 + (this.data.showlabels.length * .0125) )
         if (this.data.debug) console.log("include graph", i, this.trackedvalues.length, this.rsid,this.yval,this.labelOrder)        
-        this.stats[i] = document.createElement('a-image'); // aframe VR image that will have the DOM's graph canvas given as texture
-        this.stats[i].setAttribute('position', {x:-0.08, y:this.yval, z:0});
-        this.stats[i].setAttribute('width', 0.34);
-        this.stats[i].setAttribute('height', 0.025);
-        this.stats[i].setAttribute('id', this.rsid + '-reflector');
-        this.stats[i].setAttribute('src', '#' + this.rscanvases[i].id);
-        this.statspanel.appendChild(this.stats[i]);
+        // this.stats[i] = document.createElement('a-image'); // aframe VR image that will have the DOM's graph canvas given as texture
+        // this.stats[i].setAttribute('position', {x:-0.08, y:this.yval, z:0});
+        // this.stats[i].setAttribute('width', 0.34);
+        // this.stats[i].setAttribute('height', 0.025);
+        // this.stats[i].setAttribute('id', this.rsid + '-reflector');
+        // this.stats[i].setAttribute('src', '#' + this.rscanvases[i].id);
+        // this.statspanel.appendChild(this.stats[i]);
+        this.trackedgraphs.push(i)
       }
     }
     
     this.monoCanvas = document.createElement('canvas');
     this.monoCanvas.setAttribute("id", "value-monocanvas");
-    this.monoCanvas.setAttribute("width", 128);
+    this.monoCanvas.setAttribute("width", this.data.showgraphs.length ? 128*2.56 : 128);
     this.monoCanvas.setAttribute("height", 16*this.trackedvalues.length);
     this.monoCanvas.setAttribute("crossorigin", "anonymous");
     this.canvasParent.appendChild(this.monoCanvas)
@@ -251,10 +254,15 @@ AFRAME.registerComponent("stats-in-vr", {
     this.monoImage = document.createElement("a-image");
     this.monoImage.setAttribute("id", "aframe-rstats-text");
     this.monoImage.setAttribute("position", {x:0.17, y:1.25, z:0});
-    this.monoImage.setAttribute("width", .16);
+    this.monoImage.setAttribute("width", this.data.showgraphs.length ? .16*2.56 : .16);
     this.monoImage.setAttribute("height", .025 * this.trackedvalues.length);
     this.monoImage.setAttribute("src", "#" + this.monoCanvas.id);
     this.statspanel.appendChild(this.monoImage);
+    
+    this.monoctx = this.monoCanvas.getContext("2d"); // remove this line from tick function
+    
+    this.trackedgraphels = this.trackedgraphs.map(gi => [gi,document.querySelector('#' + this.rscanvases[gi].id)] )
+    console.log(this.trackedgraphels)
   },
 
   update: function(olddata) {
@@ -276,23 +284,23 @@ AFRAME.registerComponent("stats-in-vr", {
     statsEl.parentNode.removeChild(statsEl); // interesting...?
   },
   
-  newText: "",
   node: null,
   tick(){},
+  tickvar: null,
   willtick: function() {
     if (!this.inVR && !this.data.alwaysshow3dstats) {
       return;
     }
     if (this.trackedvalues.length) {
-      // this.newText = "";
-      this.tickctx = this.monoCanvas.getContext("2d"); // remove this line from tick function
-      this.tickctx.clearRect(0, 0, 192, 16 * this.trackedvalues.length);
-      this.tickctx.fillStyle = this.data.backgroundcolor;
-      this.tickctx.fillRect(0, 0, 192, 16 * this.trackedvalues.length);
-      this.tickctx.font = "12px monospace";
-      
+      this.monoctx.globalCompositeOperation = 'copy';
+      this.monoctx.clearRect(this.data.showgraphs.length ? 128*1.56 : 0, 0, 192, 16 * this.trackedvalues.length);
+      this.monoctx.fillStyle = this.data.backgroundcolor;
+      this.monoctx.fillRect(0, 0, this.data.showgraphs.length ? 128*2.56 : 192, 16 * this.trackedvalues.length); // because of globalCompositeOperation, this effectively clears the whole canvas (?) see: https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Compositing
+      this.monoctx.globalCompositeOperation = 'source-over';
+      this.monoctx.font = "12px monospace";
+
       for (this.tickI = 0; this.tickI < this.trackedvalues.length; this.tickI++) {
-        this.tickctx.fillStyle = 
+        this.monoctx.fillStyle = 
           !this.haveTargets || (!this.data.targetMax[this.rsids[this.trackedvalues[this.tickI]]] && !this.data.targetMin[this.rsids[this.trackedvalues[this.tickI]]]) ? 
             "black" :  
           this.data.targetMax[this.rsids[this.trackedvalues[this.tickI]]] ?
@@ -300,24 +308,41 @@ AFRAME.registerComponent("stats-in-vr", {
             (parseInt(this.rsvalues[this.trackedvalues[this.tickI]].innerText) > this.data.targetMin[this.rsids[this.trackedvalues[this.tickI]]] ? "green" : "red") ;
             // parseInt is the most performant way to do this, but it would be even better if we could somehow access the raw numbers before they go to HTML. parseInt is about a 60% slowdwon compared to using raw numbers.
         
-        this.tickctx.fillText(
+        this.monoctx.fillText(
           `${this.rsids[this.trackedvalues[this.tickI]]} ${this.rsvalues[this.trackedvalues[this.tickI]].innerText}`, 
-          2, 15.5 + (15.5*this.tickI)
+          this.data.showgraphs.length ? (128*1.56)+2 : 2, 15.5 + (15.5*this.tickI)
         );
       }
 
-      for (this.tickI = 0; this.tickI < this.trackedvalues.length*2; this.tickI++) {
-        if (this.statspanel.childNodes.item(this.tickI)?.components?.material?.shader){
-          this.node = this.statspanel.childNodes.item(this.tickI);
-          if (this.node) {
-            this.node.components.material.material.map.needsUpdate = true;
-          }
-        } 
+      for (this.tickI = 0; this.tickI < this.trackedgraphels.length; this.tickI++) {
+        // ctx.drawImage(image, dx, dy);
+        //call its drawImage() function passing it the source canvas directly
+        // console.log('drawing image','#' + this.rscanvases[this.tickvar].id,document.querySelector('#' + this.rscanvases[this.tickvar].id))
+        // this.monoctx.drawImage(document.querySelector('#' + this.rscanvases[gi].id), 0, gi * 16);
+        
+        this.monoctx.drawImage(this.trackedgraphels[this.tickI][1], 0, (this.trackedgraphels[this.tickI][0] * 15.5)+6 );
+      }
+
+      if (this.statspanel.childNodes.item(0)?.components?.material?.shader){
+        this.node = this.statspanel.childNodes.item(0);
+        if (this.node) {
+          this.node.components.material.material.map.needsUpdate = true;
+        }
       }
     }
   },
   tickI: 0,
-  tickctx: null,
+  monoctx: null,
+
+  scrap() {
+    `
+    //grab the context from your destination canvas
+    var destCtx = destinationCanvas.getContext('2d');
+
+    //call its drawImage() function passing it the source canvas directly
+    destCtx.drawImage(sourceCanvas, 0, 0);
+    `
+  },
 
   hide: function() {
     if (this.data.debug) {
