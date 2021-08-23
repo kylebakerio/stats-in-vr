@@ -21,7 +21,7 @@
 I've wanted this for a while, but I googled, found this, and then found what looked like a [promising pull request](https://github.com/chenzlabs/stats-in-vr/pull/1
 ). It hadn't been touched in 5 years, so I've spent some time updating it, improving it, making it faster, lighter, and adding features.
 
-You can access it through jsdelivr's cdn here: https://cdn.jsdelivr.net/gh/kylebakerio/stats-in-vr@1.3.0/stats-in-vr.js
+You can access it through jsdelivr's cdn here: https://cdn.jsdelivr.net/gh/kylebakerio/stats-in-vr@1.3.3/stats-in-vr.js
 
 stats-in-vr component for [A-Frame](https://aframe.io).
 
@@ -36,7 +36,7 @@ stats-in-vr component for [A-Frame](https://aframe.io).
 
 #### Browser
 
-Install and use by directly including the [browser file](https://cdn.jsdelivr.net/gh/kylebakerio/stats-in-vr@1.3.0/stats-in-vr.js):
+Install and use by directly including the [browser file](https://cdn.jsdelivr.net/gh/kylebakerio/stats-in-vr@1.3.3/stats-in-vr.js):
 
 ```html
 <head>
