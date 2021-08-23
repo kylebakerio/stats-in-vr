@@ -3,15 +3,13 @@
 /**
  * Show scene stats in VR.
  */
-
+ 
 AFRAME.registerComponent('sample-on-event',{
   schema: {
     event: { type: 'string', default: 'buttondown' },
   },
   init() {
-    // alert("adding",this.data.event)
     this.el.addEventListener(this.data.event, function (evt) { 
-      // alert("do")
        document.querySelector('[stats-in-vr]').components['stats-in-vr'].sample().then(() => {
           document.querySelector('[stats-in-vr]').components['stats-in-vr'].showSampleCanvas()
        })
@@ -19,12 +17,22 @@ AFRAME.registerComponent('sample-on-event',{
   }
 });
 
+AFRAME.registerComponent('stats-on-event',{
+  schema: {
+    event: { type: 'string', default: 'buttondown' },
+  },
+  init() {
+    this.el.addEventListener(this.data.event, function (evt) { 
+       document.querySelector('[stats-in-vr]').components['stats-in-vr'].toggle()
+    });
+  }
+});
 
 AFRAME.registerComponent("stats-in-vr", {
   dependencies: ["stats"],
 
   schema: {
-    enabled: { type: "boolean", default: true }, // currently init with this false doesn't work right, only works if done through update: todo
+    enabled: { type: "boolean", default: true },
     debug: { type: "boolean", default: false },
 
     position: { type: "string", default: "0 -1.1 -.5" },
@@ -43,6 +51,11 @@ AFRAME.registerComponent("stats-in-vr", {
     showlabels: {type: 'array', default:['raf','fps','geometries','programs','textures','calls','triangles','points','entities','load time']}, // please give all inputs in lowercase
     showgraphs: {type: 'array', default:['raf','fps','geometries','programs','textures','calls','triangles','points','entities','load time']}, // this will be auto-filtered down to match above, but you can filter down further if you want, say, 4 values in text, but only 1 in graph form. you can also select `null` or `false` or `[]` to turn off all graphs.
 
+    // targetmax
+    // targetmin
+    // samplereport
+    // ^ these three are defined below as custom schema options--basically, they take in JSON (if serializing or if defining in HTML, see examples) or straight up JS objects (if adding to scene programatically)    
+    
     samplereport: {
       // all numbers in ms
       default: JSON.stringify({
@@ -65,12 +78,8 @@ AFRAME.registerComponent("stats-in-vr", {
       stringify: JSON.stringify
     },
     
-    // targetMax
-    // targetMin
-    // ^ these two are defined below as custom schema options--basically, they take in JSON (if serializing or if defining in HTML, see examples) or straight up JS objects (if adding to scene programatically)
     // thrown in are some sane defaults. This library is written/expects all stats to be given in lowercase everywhere, they will be uppercased as needed.
     // note that you can only have one or the other defined for a given property; for performance, only one will be checked per property. to maximize performance, set no targets.
-
     targetmax: {
       default: JSON.stringify({
         calls: 200, // 
@@ -95,7 +104,7 @@ AFRAME.registerComponent("stats-in-vr", {
       },
       stringify: JSON.stringify
     },
-    targetmin: {// inverse of targetMax, for values where lower is better
+    targetmin: {// inverse of targetmax, for values where lower is better
       default: JSON.stringify({
         fps: 75,
         // you can specify targets for any stats props, and they'll turn red when they fall below target
@@ -118,6 +127,11 @@ AFRAME.registerComponent("stats-in-vr", {
     }
   },
 
+  toggle() {
+    if (this.data.debug) console.log("toggle enabled to", !this.data.enabled)
+    this.data.enabled = !this.data.enabled;
+    this.update()
+  },
   inVR: false,
   init: function() {
     if (this.data.debug) {
@@ -151,7 +165,6 @@ AFRAME.registerComponent("stats-in-vr", {
                 document.querySelector('[stats-in-vr]').components['stats-in-vr'].showSampleCanvas(this.data.samplereport.displayDuration)
             })
           },this.data.samplereport.delay)
-          
         }
       } else if (this.data.debug) {
         console.warn("stats-in-vr is not enabled")
@@ -249,7 +262,6 @@ AFRAME.registerComponent("stats-in-vr", {
     this.rsvalues = [];
     this.stats = [];
     
-    
     if (!this.rscanvases) {
       this.rscanvases = document.querySelectorAll(".rs-canvas");
     }
@@ -328,7 +340,7 @@ AFRAME.registerComponent("stats-in-vr", {
     this.statspanel.setAttribute("position", this.data.position);
     this.statspanel.setAttribute("scale", this.data.scale);
     if (this.tick) this.tick = AFRAME.utils.throttleTick(this.willtick, this.data.throttle, this);
-    return this.data.enabled ? this.show() : this.hide();
+    this.data.enabled ? this.show() : this.hide();
   },
 
   remove: function() {
@@ -345,7 +357,7 @@ AFRAME.registerComponent("stats-in-vr", {
   },
   tick(){},
   willtick: function() {
-    if (!this.inVR && !this.data.alwaysshow3dstats) {
+    if ((!this.inVR && !this.data.alwaysshow3dstats) || !this.data.enabled) {
       return;
     }
     if (this.trackedvalues.length) {
