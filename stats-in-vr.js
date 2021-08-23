@@ -3,50 +3,90 @@
 /**
  * Show scene stats in VR.
  */
-const capitalizeWord = function(word) {
-  return word[0].toUpperCase() + word.slice(1,word.length)
-}
+
+AFRAME.registerComponent('sample-on-event',{
+  schema: {
+    event: { type: 'string', default: 'buttondown' },
+  },
+  init() {
+    // alert("adding",this.data.event)
+    this.el.addEventListener(this.data.event, function (evt) { 
+      // alert("do")
+       document.querySelector('[stats-in-vr]').components['stats-in-vr'].sample().then(() => {
+          document.querySelector('[stats-in-vr]').components['stats-in-vr'].showSampleCanvas()
+       })
+    });
+  }
+});
+
 
 AFRAME.registerComponent("stats-in-vr", {
   dependencies: ["stats"],
 
   schema: {
-    enabled: { type: "boolean", default: true },
+    enabled: { type: "boolean", default: true }, // currently init with this false doesn't work right, only works if done through update: todo
     debug: { type: "boolean", default: false },
-    
-    position: { type: "string", default: "0 -1.1 -1" },
+
+    position: { type: "string", default: "0 -1.1 -.5" },
     rotation: { type: "string", default: "-20 0 0" },
     scale: { type: "string", default: "1 .8 1" },
-    
+
     performancemode: { type: "boolean", default: false }, // set of defaults to focus on making it as light of impact as possible
-    throttle: { type: "number", default: 50 }, // how many ms between recalc, has biggest effect on performance (try it out for yourself! hah)
-    
-    backgroundcolor: { type:"color", default: "rgba(255, 255, 255, 0.5)"}, // you can specify solid colors to be slightly more performant
-    
+    throttle: { type: "number", default: 15 }, // how many ms between recalc, has biggest effect on performance (try it out for yourself! hah)
+
+    backgroundcolor: { type:"color", default: "orange"}, // you can specify solid colors to be slightly more performant
+
     show2dstats: { type: "boolean", default: true },  // show the built-in 'stats' component when not in VR
     alwaysshow3dstats: { type: "boolean", default: false },  // show this component even when not in VR
     anchorel: { type: "selector", default: "[camera]" }, // anchor in-vr stats to something other than the camera
-    
-    showlabels: {type: 'array', default:['raf','fps','geometries','programs','textures','calls','triangles','points','entities','load']}, // please give all inputs in lowercase
-    showgraphs: {type: 'array', default:['raf','fps','geometries','programs','textures','calls','triangles','points','entities','load']}, // this will be auto-filtered down to match above, but you can filter down further if you want, say, 4 values in text, but only 1 in graph form. you can also select `null` or `false` or `[]` to turn off all graphs.
+
+    showlabels: {type: 'array', default:['raf','fps','geometries','programs','textures','calls','triangles','points','entities','load time']}, // please give all inputs in lowercase
+    showgraphs: {type: 'array', default:['raf','fps','geometries','programs','textures','calls','triangles','points','entities','load time']}, // this will be auto-filtered down to match above, but you can filter down further if you want, say, 4 values in text, but only 1 in graph form. you can also select `null` or `false` or `[]` to turn off all graphs.
+
+    samplereport: {
+      // all numbers in ms
+      default: JSON.stringify({
+        autostart: false, // if false, can be programtically started by e.g. a button press by calling 
+                          // if true, will fire every time `enter-vr` event is triggered
+        /*
+          const ticksToSample = 600;
+          const durationToShowVRSampleReport = 20000 // 20 seconds
+          document.querySelector('[stats-in-vr]').components['stats-in-vr'].sample(ticksToSample).then(() => {
+              document.querySelector('[stats-in-vr]').components['stats-in-vr'].showSampleCanvas(durationToShowVRSampleReport)
+          })
+        */
+        delay: 0, // if autostart true, how long after app launch to auto-start sampling
+        samples: 60, // if autostart true, how many samples to take
+        displayDuration: 30000, // how long to leave report up in VR before auto-closing
+      }),
+      parse: json => {
+        return typeof json === "string" ? JSON.parse(json) : json; 
+      },
+      stringify: JSON.stringify
+    },
     
     // targetMax
     // targetMin
     // ^ these two are defined below as custom schema options--basically, they take in JSON (if serializing or if defining in HTML, see examples) or straight up JS objects (if adding to scene programatically)
     // thrown in are some sane defaults. This library is written/expects all stats to be given in lowercase everywhere, they will be uppercased as needed.
+    // note that you can only have one or the other defined for a given property; for performance, only one will be checked per property. to maximize performance, set no targets.
 
-    targetMax: {
+    targetmax: {
       default: JSON.stringify({
         calls: 200, // 
         raf: 15, // needed to keep responsiveness around 60fps
         triangles: 100000,
-        load: 3000,
+        "load time": 3000,
         // you can specify your own targets for any stats props, and they'll turn red when they rise above target
         // this does come with a small performance penalty
       }),
       capLabels: ['geometries','programs','textures','calls','triangles','points','entities','load'], // these props are auto-uppercased once for faster processing in tick handler
       parse: json => {
         const output = typeof json === "string" ? JSON.parse(json) : json; 
+        
+        const capitalizeWord = function(word) {
+          return word[0].toUpperCase() + word.slice(1,word.length)
+        }
         Object.keys(output).forEach(label => {
           output[capitalizeWord(label)] = output[label]
         })
@@ -55,7 +95,7 @@ AFRAME.registerComponent("stats-in-vr", {
       },
       stringify: JSON.stringify
     },
-    targetMin: {// inverse of targetMax, for values where lower is better
+    targetmin: {// inverse of targetMax, for values where lower is better
       default: JSON.stringify({
         fps: 75,
         // you can specify targets for any stats props, and they'll turn red when they fall below target
@@ -64,6 +104,10 @@ AFRAME.registerComponent("stats-in-vr", {
       capLabels: ['geometries','programs','textures','calls','triangles','points','entities','load'], // these props are auto-uppercased once for faster processing in tick handler
       parse: json => {
         const output = typeof json === "string" ? JSON.parse(json) : json; 
+        
+        const capitalizeWord = function(word) {
+          return word[0].toUpperCase() + word.slice(1,word.length)
+        }
         Object.keys(output).forEach(label => {
           output[capitalizeWord(label)] = output[label]
         })
@@ -73,13 +117,14 @@ AFRAME.registerComponent("stats-in-vr", {
       stringify: JSON.stringify
     }
   },
-  
+
   inVR: false,
   init: function() {
     if (this.data.debug) {
       console.warn("init stats-in-vr")
     }
-    this.haveTargets = !!(Object.keys(this.data.targetMax).length + Object.keys(this.data.targetMin).length)
+    
+    this.haveTargets = !!(Object.keys(this.data.targetmax).length + Object.keys(this.data.targetmin).length)
     this.canvasParent = document.createElement('div');
     this.canvasParent.setAttribute('id','stats-in-vr-canvas-parent')
     this.sceneEl = AFRAME.scenes[0]
@@ -96,24 +141,36 @@ AFRAME.registerComponent("stats-in-vr", {
     AFRAME.scenes[0].addEventListener('enter-vr', async () => {
       this.inVR = true;
       if (this.data.enabled) {
-        if (this.data.debug) console.warn("entered VR, showing stats")
+        if (this.data.debug) console.log("entered VR, showing stats")
         this.show()
+        if (this.data.samplereport.autostart) {
+          if (this.data.debug) console.log("will autostart sampleReport")
+          
+          setTimeout(() => {
+            document.querySelector('[stats-in-vr]').components['stats-in-vr'].sample(this.data.samplereport.samples).then(() => {
+                document.querySelector('[stats-in-vr]').components['stats-in-vr'].showSampleCanvas(this.data.samplereport.displayDuration)
+            })
+          },this.data.samplereport.delay)
+          
+        }
       } else if (this.data.debug) {
         console.warn("stats-in-vr is not enabled")
+        this.hide()
       }
     })
     AFRAME.scenes[0].addEventListener('exit-vr', async () => {
       this.inVR = false;
       if (!this.data.alwaysshow3dstats) {
-        if (this.data.debug) console.warn("hiding VR stats")
+        if (this.data.debug) console.log("hiding VR stats")
         this.hide();
       } else {
-        if (this.data.debug) console.warn("persistent 3d stats enabled, won't hide")
+        if (this.data.debug) console.log("persistent 3d stats enabled, won't hide")
+        this.show()
       }
     })
     
     if (!this.data.show2dstats) {
-      if (this.data.debug) console.warn("hiding 2d stats panel")
+      if (this.data.debug) console.log("hiding 2d stats panel")
       this.sceneEl.components.stats.statsEl.style = 'display: none !important;';
       this.sceneEl.components.stats.statsEl.className = 'a-hidden';
     }
@@ -159,6 +216,7 @@ AFRAME.registerComponent("stats-in-vr", {
     else if (!this.inVR) {
       this.hide();
     }
+    
   },
   
   waitForTime: async function(ms) {
@@ -212,7 +270,7 @@ AFRAME.registerComponent("stats-in-vr", {
       this.idsuffix = this.rsids[i].replace(" ", "_");
       this.rscanvases[i].id = "rstats-" + this.idsuffix;
       
-      const checkIfTrackedLabel = this.rsid.toLowerCase().split(" ")[0]
+      const checkIfTrackedLabel = this.rsid.toLowerCase()//.split(" ")[0]
       
       console.log(this.rsid.toLowerCase(), this.idsuffix, checkIfTrackedLabel, this.data.showlabels.includes(checkIfTrackedLabel))
       if (this.data.showlabels.includes(checkIfTrackedLabel)) {
@@ -255,6 +313,8 @@ AFRAME.registerComponent("stats-in-vr", {
     this.monoImage.setAttribute("height", .025 * this.trackedvalues.length);
     this.monoImage.setAttribute("src", "#" + this.monoCanvas.id);
     this.statspanel.appendChild(this.monoImage);
+    
+    this.tickctx = this.monoCanvas.getContext("2d");
   },
 
   update: function(olddata) {
@@ -264,7 +324,7 @@ AFRAME.registerComponent("stats-in-vr", {
     } else {
       console.warn("non-skipped update",olddata,this.data)
     }
-    this.haveTargets = (this.data.targetMax || this.data.targetMin) && !!Object.keys(this.data.targetMax).length || !!Object.keys(this.data.targetMin).length;
+    this.haveTargets = (this.data.targetmax || this.data.targetmin) && !!Object.keys(this.data.targetmax).length || !!Object.keys(this.data.targetmin).length;
     this.statspanel.setAttribute("position", this.data.position);
     this.statspanel.setAttribute("scale", this.data.scale);
     if (this.tick) this.tick = AFRAME.utils.throttleTick(this.willtick, this.data.throttle, this);
@@ -276,48 +336,184 @@ AFRAME.registerComponent("stats-in-vr", {
     statsEl.parentNode.removeChild(statsEl); // interesting...?
   },
   
-  newText: "",
-  node: null,
+  tv: {
+    node: null,
+    tickI: 0,
+    tickctx: null,
+    label: null,
+    value: null,
+  },
   tick(){},
   willtick: function() {
     if (!this.inVR && !this.data.alwaysshow3dstats) {
       return;
     }
     if (this.trackedvalues.length) {
-      // this.newText = "";
-      this.tickctx = this.monoCanvas.getContext("2d"); // remove this line from tick function
       this.tickctx.clearRect(0, 0, 192, 16 * this.trackedvalues.length);
       this.tickctx.fillStyle = this.data.backgroundcolor;
       this.tickctx.fillRect(0, 0, 192, 16 * this.trackedvalues.length);
       this.tickctx.font = "12px monospace";
       
-      for (this.tickI = 0; this.tickI < this.trackedvalues.length; this.tickI++) {
+      for (this.tv.tickI = 0; this.tv.tickI < this.trackedvalues.length; this.tv.tickI++) {
+        this.tv.label = this.rsids[this.trackedvalues[this.tv.tickI]];
+        this.tv.value = parseInt(this.rsvalues[this.trackedvalues[this.tv.tickI]].innerText);
+        // parseInt is the most performant way to do this, but it would be even better if we could somehow access the raw numbers before they go to HTML. parseInt is about a 60% slowdwon compared to using raw numbers.
+        
         this.tickctx.fillStyle = 
-          !this.haveTargets || (!this.data.targetMax[this.rsids[this.trackedvalues[this.tickI]]] && !this.data.targetMin[this.rsids[this.trackedvalues[this.tickI]]]) ? 
+          !this.haveTargets || (!this.data.targetmax[this.tv.label] && !this.data.targetmin[this.tv.label]) ? 
             "black" :  
-          this.data.targetMax[this.rsids[this.trackedvalues[this.tickI]]] ?
-            (parseInt(this.rsvalues[this.trackedvalues[this.tickI]].innerText) < this.data.targetMax[this.rsids[this.trackedvalues[this.tickI]]] ? "green" : "red") :
-            (parseInt(this.rsvalues[this.trackedvalues[this.tickI]].innerText) > this.data.targetMin[this.rsids[this.trackedvalues[this.tickI]]] ? "green" : "red") ;
-            // parseInt is the most performant way to do this, but it would be even better if we could somehow access the raw numbers before they go to HTML. parseInt is about a 60% slowdwon compared to using raw numbers.
+          this.data.targetmax[this.tv.label] ?
+            (this.tv.value < this.data.targetmax[this.tv.label] ? "green" : "red") :
+            (this.tv.value > this.data.targetmin[this.tv.label] ? "green" : "red") ;
         
         this.tickctx.fillText(
-          `${this.rsids[this.trackedvalues[this.tickI]]} ${this.rsvalues[this.trackedvalues[this.tickI]].innerText}`, 
-          2, 15.5 + (15.5*this.tickI)
+          `${this.tv.label} ${this.tv.value}`, 
+          2, 15.5 + (15.5*this.tv.tickI)
         );
+        
+        this.runSample() // no-op unless sample is active
       }
 
-      for (this.tickI = 0; this.tickI < this.trackedvalues.length*2; this.tickI++) {
-        if (this.statspanel.childNodes.item(this.tickI)?.components?.material?.shader){
-          this.node = this.statspanel.childNodes.item(this.tickI);
-          if (this.node) {
-            this.node.components.material.material.map.needsUpdate = true;
+      for (this.tv.tickI = 0; this.tv.tickI < this.trackedvalues.length*2; this.tv.tickI++) {
+        if (this.statspanel.childNodes.item(this.tv.tickI)?.components?.material?.shader){
+          this.tv.node = this.statspanel.childNodes.item(this.tv.tickI);
+          if (this.tv.node) {
+            this.tv.node.components.material.material.map.needsUpdate = true;
           }
         } 
       }
     }
   },
-  tickI: 0,
-  tickctx: null,
+  
+  sampleTrack: {
+    // set dynamically by runSample()
+  },
+  stopSample: false,
+  sample(sampleCount=this.data.samplereport.samples) {
+    return new Promise((resolve, reject) => {
+      this.samplesRun = 0;
+      this.sampleStart = Date.now()
+      const predictedTime = this.data.throttle*sampleCount/1000;
+      console.log('Running Sample...')
+      console.log('Should theoretically take:',Math.round(predictedTime),'~seconds, at',Math.round(1000/this.data.throttle),'~samples per second')
+      console.log('you can check progress while waiting:',`document.querySelector('[stats-in-vr]').components['stats-in-vr'].samplesRun`)
+      console.log('you can end sampling at any time:',`document.querySelector('[stats-in-vr]').components['stats-in-vr'].stopSample = true`)
+
+      this.stopSample = true; // kill any currently running sample process
+      this.runSample = () => {
+        if (this.tv.tickI === 0) this.samplesRun++
+
+        if (this.samplesRun === 1) {
+          this.stopSample = false;
+          this.sampleTrack[this.tv.label] = {
+            total: 0,
+            high: 0,
+            low: Infinity,
+          }
+        }
+
+        if (this.samplesRun < sampleCount && !this.stopSample) {
+          this.sampleTrack[this.tv.label].total += this.tv.value
+          this.sampleTrack[this.tv.label].high = this.sampleTrack[this.tv.label].high > this.tv.value ? this.sampleTrack[this.tv.label].high : this.tv.value
+          this.sampleTrack[this.tv.label].low = this.sampleTrack[this.tv.label].low < this.tv.value ? this.sampleTrack[this.tv.label].low : this.tv.value
+        } else {
+          const duration = (Date.now() - this.sampleStart)/1000;
+          const expectedTime = this.data.throttle*this.samplesRun/1000 // different than predictedTime, because could be stopped earlyer with this.stopSample
+
+          this.sampleReport  = `Sample Report:\n`;
+          this.sampleReport += `samples: ${this.samplesRun}\n`
+          this.sampleReport += `duration: ${duration} sec (vs. ${expectedTime} sec expected)\n`
+          this.sampleReport += `throttle lag: ${Math.round( ((duration-expectedTime) / expectedTime) * 10000)/100}%\n`
+          this.sampleReport += `\nstat     | average  | high    | low`
+          this.sampleReport += `\n-------------------------------------`
+
+          Object.keys(this.sampleTrack).forEach(label => {
+            this.sampleReport += `\n${label}|${Math.round((this.sampleTrack[label].total/this.samplesRun)*100)/100}|${this.sampleTrack[label].high}|${this.sampleTrack[label].low}`; // line format is critical for canvas function
+            delete this.sampleTrack[label];
+          });
+
+          console.log(this.sampleReport);
+
+          this.runSample = () => {};
+          this.stopSample = false;
+          resolve();
+        }
+      };
+    })
+  },
+  runSample() {}, // dynamically set by calling sample()
+  showSampleCanvas(displayDuration=this.data.samplereport.displayDuration) {
+    const sampleLines = this.sampleReport.split("\n");
+
+    if (!this.sampleCanvas) {
+      this.sampleCanvas = document.createElement('canvas');
+      this.sampleCanvas.setAttribute("id", "sample-canvas");
+      this.sampleCanvas.setAttribute("width", 315);
+      this.sampleCanvas.setAttribute("height", 16* (sampleLines.length));
+      this.sampleCanvas.setAttribute("crossorigin", "anonymous");
+      this.canvasParent.appendChild(this.sampleCanvas)
+      
+      this.sampleImage = document.createElement("a-image");
+      this.sampleImage.setAttribute("id", "aframe-sample-text");
+      this.sampleImage.setAttribute("position", {x:0, y:1.6, z:0});
+      this.sampleImage.setAttribute("width", .396);
+      this.sampleImage.setAttribute("height", .025 * (sampleLines.length));
+      this.sampleImage.setAttribute("src", "#" + this.sampleCanvas.id);
+      this.statspanel.appendChild(this.sampleImage);
+    }
+    
+    const ctx = this.sampleCanvas.getContext("2d");
+    
+    ctx.clearRect(0, 0, 315, 16 * (sampleLines.length));
+    ctx.fillStyle = this.data.backgroundcolor;
+    ctx.fillRect(0, 0, 315, 16 * (sampleLines.length));
+    ctx.font = "12px monospace";
+
+    for (let i = 0; i < sampleLines.length; i++) {
+      const potentialLabel = sampleLines[i].trim().split('|')[0];
+      // let labelIndex = null;
+      if (this.rsids.includes(potentialLabel)) {
+        console.log("found label", potentialLabel)
+        // labelIndex = this.rsids.indexOf(potentialLabel);
+        
+        ctx.fillText(
+          potentialLabel,
+          2, 15.5 + (15.5*i)
+        );
+      
+        sampleLines[i].split("|").forEach((chunk,x) => {
+          if (x === 0) return
+          const value = chunk;
+
+          ctx.fillStyle = 
+            !this.haveTargets || (!this.data.targetmax[potentialLabel] && !this.data.targetmin[potentialLabel]) ? 
+              "black" :  
+            this.data.targetmax[potentialLabel] ?
+              (value < this.data.targetmax[potentialLabel] ? "green" : "red") :
+              (value > this.data.targetmin[potentialLabel] ? "green" : "red") ;
+          
+          ctx.fillText(chunk, x*(315/4) || 2, 15.5 + (15.5*i))
+          
+        })
+      
+      } else {
+        console.log("not label", potentialLabel)
+        ctx.fillStyle = "black"
+        
+        ctx.fillText(
+          sampleLines[i], 
+          2, 15.5 + (15.5*i)
+        );
+      }
+    }
+    
+    this.sampleImage.setAttribute('material','visible','true');
+    setTimeout(this.hideSampleCanvas.bind(this), displayDuration);
+  },
+  hideSampleCanvas() {
+    this.sampleImage.setAttribute('material','visible','false')
+  },
+  
 
   hide: function() {
     if (this.data.debug) {
