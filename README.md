@@ -18,7 +18,7 @@
 
 ## yet another necro component pulled into service
 
-I've wanted this for a while, but I googled, found this, and then found a library that used to do what I wanted 5 years ago in an older version of A-Frame. It hadn't been touched in 5 years, so I've spent some time--arguably too much time--updating it, improving it, making it faster, lighter, and adding features.
+I've wanted this for a while, but I googled, found this, and then found a library that used to do what I wanted 5 years ago (and hadn't been touched since) in an older version of A-Frame. I've spent some time--arguably too much time--almost completely rewriting it, improving it, making it faster, lighter, and adding features.
 
 You can access it through jsdelivr's cdn here: https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@1.4.0/vr-super-stats.js
 
