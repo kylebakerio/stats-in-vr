@@ -22,8 +22,6 @@ I've wanted this for a while, but I googled, found this, and then found a librar
 
 You can access it through jsdelivr's cdn here: https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@1.4.0/stats-in-vr.js
 
-stats-in-vr component for [A-Frame](https://aframe.io).
-
 ![stats-in-vr](https://user-images.githubusercontent.com/6391152/130007970-a512c190-0a4e-4f0d-8c40-0d8e1e9e58e8.png)
 ![orange](https://user-images.githubusercontent.com/6391152/130179324-d68f276d-1ccf-4f7c-90fc-1a872bb4fe61.png)
 ![some-graphs-only](https://user-images.githubusercontent.com/6391152/130179339-85f94d50-414a-43ae-b9c7-53304a245921.png)
