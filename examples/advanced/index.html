@@ -16,7 +16,7 @@
   ='debug:true; anchorel:#the-box; position:0 .4 0; showlabels: fps,raf; showgraphs:fps,raf; alwaysshow3dstats:true; show2dstats:false; debug:true; throttle:100; backgroundcolor:orange;' 
   -->
     <!-- here we're attaching it to the user's controller, remove anchorel and position if you want it attached to user's head. We've also set custom targets here. -->
-    <a-scene stats-in-vr='anchorel:#right-hand; position:0 -.5 0; targetMin:{"fps":59};targetMax:{"raf":30};'>
+    <a-scene stats-in-vr='anchorel:#right-hand; position:0 -.5 0; targetMin:{"fps":59}; targetMax:{"raf":30}; samplereport:{"autostart":true};'>
       <a-entity id="rig" movement-controls="fly:true;" position="0 0 0">
         
         <a-entity camera id="the-cam"position="0 1.6 0"look-controls="pointerLockEnabled: false"> </a-entity>

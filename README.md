@@ -19,7 +19,7 @@
 ## yet another necro component pulled into service
 
 I've wanted this for a while, but I googled, found this, and then found what looked like a [promising pull request](https://github.com/chenzlabs/stats-in-vr/pull/1
-). It hadn't been touched in 5 years, so I've spent some time updating it, improving it, making it faster, lighter, and adding features.
+). It hadn't been touched in 5 years, so I've spent some time--arguably too much time--updating it, improving it, making it faster, lighter, and adding features.
 
 You can access it through jsdelivr's cdn here: https://cdn.jsdelivr.net/gh/kylebakerio/stats-in-vr@1.4.0/stats-in-vr.js
 
@@ -51,7 +51,7 @@ Install and use by directly including the [browser file](https://cdn.jsdelivr.ne
 ```
 
 
-## Examples
+## Usage Examples
 
 ### default behavior:
 when you enter VR, full stats get attached to your face, about half a meter down and forward from you. When you are not in VR, you see the normal 2d stats.
@@ -117,7 +117,7 @@ runs and displays a report on stats collected from 600 ticks
 
 ### attach translucent stats to your left hand when you enter vr:
 ```html
-    <a-scene stats-in-vr="anchorel:#left-hand; position:0 -.5 0; fillstyle:rgba(255, 255, 255, 0.5);">
+    <a-scene stats-in-vr="anchorel:#left-hand; position:0 -.5 0; backgroundcolor:rgba(255, 255, 255, 0.8);">
       <a-entity id="rig" position="0 0 0">
         <a-camera camera position="0 1.6 0" look-controls></a-camera>
         <a-entity hand-controls="hand: left" id="left-hand"></a-entity>
@@ -128,7 +128,7 @@ runs and displays a report on stats collected from 600 ticks
 
 ### make stats appear on your right controller when you press button on your right controller, run sampling when you press button on left controller
 ```html
-<a-scene stats-in-vr="anchorel:#right-hand; position:0 -.5 0; fillstyle:rgba(255, 255, 255, 0.5)" >
+<a-scene stats-in-vr="anchorel:#right-hand; position:0 -.5 0;" >
       <a-entity id="rig" position="0 0 0">
         <a-entity camera id="the-cam" position="0 1.6 0"></a-entity>
         <a-entity sample-on-event id="left-hand" hand-controls="hand: left"></a-entity>
@@ -145,8 +145,9 @@ stick a VR panel somewhere you want in the scene, and make it stay there, whethe
 </a-scene>
 ```
 
-## Glitch
-https://glitch.com/edit/#!/stats-in-vr?path=index.html%3A17%3A30
+## Demo
+[Glitch](https://glitch.com/edit/#!/stats-in-vr?path=index.html%3A17%3A30)
+Or, see the examples in this repo.
 
 ## params
 ```js
@@ -162,7 +163,7 @@ https://glitch.com/edit/#!/stats-in-vr?path=index.html%3A17%3A30
     performancemode: { type: "boolean", default: false }, // set of defaults to focus on making it as light of impact as possible
     throttle: { type: "number", default: 15 }, // how many ms between recalc, has biggest effect on performance (try it out for yourself! hah)
 
-    backgroundcolor: { type:"color", default: "orange"}, // you can specify solid colors to be slightly more performant
+    backgroundcolor: { type:"color", default: "orange"}, // you can specify rgba colors as well.
 
     show2dstats: { type: "boolean", default: true },  // show the built-in 'stats' component when not in VR
     alwaysshow3dstats: { type: "boolean", default: false },  // show this component even when not in VR

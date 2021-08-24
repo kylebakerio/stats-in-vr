@@ -42,7 +42,7 @@ AFRAME.registerComponent("stats-in-vr", {
     performancemode: { type: "boolean", default: false }, // set of defaults to focus on making it as light of impact as possible
     throttle: { type: "number", default: 15 }, // how many ms between recalc, has biggest effect on performance (try it out for yourself! hah)
 
-    backgroundcolor: { type:"color", default: "orange"}, // you can specify solid colors to be slightly more performant
+    backgroundcolor: { type:"color", default: "orange"}, // you can specify semi-transparent colors using css style rgba(r,g,b,a) color declarations as well.
 
     show2dstats: { type: "boolean", default: true },  // show the built-in 'stats' component when not in VR
     alwaysshow3dstats: { type: "boolean", default: false },  // show this component even when not in VR
