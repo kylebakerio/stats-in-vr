@@ -51,6 +51,10 @@ AFRAME.registerComponent("vr-super-stats", {
     showlabels: {type: 'array', default:['raf','fps','geometries','programs','textures','calls','triangles','points','entities','load time']}, // please give all inputs in lowercase
     showgraphs: {type: 'array', default:['raf','fps','geometries','programs','textures','calls','triangles','points','entities','load time']}, // this will be auto-filtered down to match above, but you can filter down further if you want, say, 4 values in text, but only 1 in graph form. you can also select `null` or `false` or `[]` to turn off all graphs.
 
+    //
+    // advanced options:
+    // 
+    
     // targetmax
     // targetmin
     // samplereport
