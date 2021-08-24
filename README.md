@@ -20,7 +20,7 @@
 
 I've wanted this for a while, but I googled, found this, and then found a library that used to do what I wanted 5 years ago in an older version of A-Frame. It hadn't been touched in 5 years, so I've spent some time--arguably too much time--updating it, improving it, making it faster, lighter, and adding features.
 
-You can access it through jsdelivr's cdn here: https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@1.4.0/stats-in-vr.js
+You can access it through jsdelivr's cdn here: https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@1.4.0/vr-super-stats.js
 
 ![stats-in-vr](https://user-images.githubusercontent.com/6391152/130007970-a512c190-0a4e-4f0d-8c40-0d8e1e9e58e8.png)
 ![orange](https://user-images.githubusercontent.com/6391152/130179324-d68f276d-1ccf-4f7c-90fc-1a872bb4fe61.png)
@@ -33,17 +33,17 @@ You can access it through jsdelivr's cdn here: https://cdn.jsdelivr.net/gh/kyleb
 
 #### Browser
 
-Install and use by directly including the [browser file](https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@1.4.0/stats-in-vr.js):
+Install and use by directly including the [browser file](https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@1.4.0/vr-super-stats.js):
 
 ```html
 <head>
   <title>My A-Frame Scene</title>
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@1.4.0/stats-in-vr.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@1.4.0/vr-super-stats.js"></script>
 </head>
 
 <body>
-  <a-scene stats-in-vr></a-scene>
+  <a-scene vr-super-statsr></a-scene>
 </body>
 ```
 
