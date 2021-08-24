@@ -1,3 +1,4 @@
+![loading-bar](https://user-images.githubusercontent.com/6391152/130669882-2c535623-1fdd-4464-8b75-3feb97cc01b9.png)
 ![sample-report-3](https://user-images.githubusercontent.com/6391152/130512748-a3dcea0c-38ff-4744-bf9a-54c23f3d85e5.png)
 
 # features
