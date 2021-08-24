@@ -10,8 +10,8 @@ AFRAME.registerComponent('sample-on-event',{
   },
   init() {
     this.el.addEventListener(this.data.event, function (evt) { 
-       document.querySelector('[stats-in-vr]').components['stats-in-vr'].sample().then(() => {
-          document.querySelector('[stats-in-vr]').components['stats-in-vr'].showSampleCanvas()
+       document.querySelector('[vr-super-stats]').components['vr-super-stats'].sample().then(() => {
+          document.querySelector('[vr-super-stats]').components['vr-super-stats'].showSampleCanvas()
        })
     });
   }
@@ -23,12 +23,12 @@ AFRAME.registerComponent('stats-on-event',{
   },
   init() {
     this.el.addEventListener(this.data.event, function (evt) { 
-       document.querySelector('[stats-in-vr]').components['stats-in-vr'].toggle()
+       document.querySelector('[vr-super-stats]').components['vr-super-stats'].toggle()
     });
   }
 });
 
-AFRAME.registerComponent("stats-in-vr", {
+AFRAME.registerComponent("vr-super-stats", {
   dependencies: ["stats"],
 
   schema: {
@@ -64,8 +64,8 @@ AFRAME.registerComponent("stats-in-vr", {
         /*
           const ticksToSample = 600;
           const durationToShowVRSampleReport = 20000 // 20 seconds
-          document.querySelector('[stats-in-vr]').components['stats-in-vr'].sample(ticksToSample).then(() => {
-              document.querySelector('[stats-in-vr]').components['stats-in-vr'].showSampleCanvas(durationToShowVRSampleReport)
+          document.querySelector('[vr-super-stats]').components['vr-super-stats'].sample(ticksToSample).then(() => {
+              document.querySelector('[vr-super-stats]').components['vr-super-stats'].showSampleCanvas(durationToShowVRSampleReport)
           })
         */
         delay: 0, // if autostart true, how long after app launch to auto-start sampling
@@ -135,12 +135,12 @@ AFRAME.registerComponent("stats-in-vr", {
   inVR: false,
   init: function() {
     if (this.data.debug) {
-      console.warn("init stats-in-vr")
+      console.warn("init vr-super-stats")
     }
     
     this.haveTargets = !!(Object.keys(this.data.targetmax).length + Object.keys(this.data.targetmin).length)
     this.canvasParent = document.createElement('div');
-    this.canvasParent.setAttribute('id','stats-in-vr-canvas-parent')
+    this.canvasParent.setAttribute('id','vr-super-stats-canvas-parent')
     this.sceneEl = AFRAME.scenes[0]
     
     if (this.data.performancemode) {
@@ -161,13 +161,13 @@ AFRAME.registerComponent("stats-in-vr", {
           if (this.data.debug) console.log("will autostart sampleReport")
           
           setTimeout(() => {
-            document.querySelector('[stats-in-vr]').components['stats-in-vr'].sample(this.data.samplereport.samples).then(() => {
-                document.querySelector('[stats-in-vr]').components['stats-in-vr'].showSampleCanvas(this.data.samplereport.displayDuration)
+            document.querySelector('[vr-super-stats]').components['vr-super-stats'].sample(this.data.samplereport.samples).then(() => {
+                document.querySelector('[vr-super-stats]').components['vr-super-stats'].showSampleCanvas(this.data.samplereport.displayDuration)
             })
           },this.data.samplereport.delay)
         }
       } else if (this.data.debug) {
-        console.warn("stats-in-vr is not enabled")
+        console.warn("vr-super-stats is not enabled")
         this.hide()
       }
     })
@@ -408,8 +408,8 @@ AFRAME.registerComponent("stats-in-vr", {
       const predictedTime = this.data.throttle*sampleCount/1000;
       console.log('Running Sample...')
       console.log('Should theoretically take:',Math.round(predictedTime),'~seconds, at',Math.round(1000/this.data.throttle),'~samples per second')
-      console.log('you can check progress while waiting:',`document.querySelector('[stats-in-vr]').components['stats-in-vr'].samplesRun`)
-      console.log('you can end sampling at any time:',`document.querySelector('[stats-in-vr]').components['stats-in-vr'].stopSample = true`)
+      console.log('you can check progress while waiting:',`document.querySelector('[vr-super-stats]').components['vr-super-stats'].samplesRun`)
+      console.log('you can end sampling at any time:',`document.querySelector('[vr-super-stats]').components['vr-super-stats'].stopSample = true`)
 
       this.stopSample = true; // kill any currently running sample process
       this.runSample = () => {
