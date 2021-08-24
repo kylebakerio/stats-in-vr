@@ -40,7 +40,7 @@ AFRAME.registerComponent("vr-super-stats", {
     scale: { type: "string", default: "1 .8 1" },
 
     performancemode: { type: "boolean", default: false }, // set of defaults to focus on making it as light of impact as possible
-    throttle: { type: "number", default: 15 }, // how many ms between recalc, has biggest effect on performance (try it out for yourself! hah)
+    throttle: { type: "number", default: 50 }, // how many ms between recalc, has biggest effect on performance (which, here, you can easily see for yourself! hah.)
 
     backgroundcolor: { type:"color", default: "orange"}, // you can specify semi-transparent colors using css style rgba(r,g,b,a) color declarations as well.
 
@@ -69,7 +69,7 @@ AFRAME.registerComponent("vr-super-stats", {
           })
         */
         delay: 0, // if autostart true, how long after app launch to auto-start sampling
-        samples: 60, // if autostart true, how many samples to take
+        samples: 200, // if autostart true, how many samples to take
         displayDuration: 30000, // how long to leave report up in VR before auto-closing
       }),
       parse: json => {
@@ -82,10 +82,12 @@ AFRAME.registerComponent("vr-super-stats", {
     // note that you can only have one or the other defined for a given property; for performance, only one will be checked per property. to maximize performance, set no targets.
     targetmax: {
       default: JSON.stringify({
-        calls: 200, // 
+        calls: 200, // too many draw calls kills responsiveness
         raf: 15, // needed to keep responsiveness around 60fps
-        triangles: 100000,
-        "load time": 3000,
+        triangles: 100000, // rough limit for mobile experiences to be smooth
+        "load time": 3000, // subjective
+        points: 15000, // unsure, I've heard 20000 is a drag, but likely lower than that
+        entities: 200, // unsure, I'm more familiar with draw calls, suggested improved number here welcome
         // you can specify your own targets for any stats props, and they'll turn red when they rise above target
         // this does come with a small performance penalty
       }),
@@ -106,7 +108,7 @@ AFRAME.registerComponent("vr-super-stats", {
     },
     targetmin: {// inverse of targetmax, for values where lower is better
       default: JSON.stringify({
-        fps: 75,
+        fps: 75, // phones cap at 60, quest 1 aimed for 75.
         // you can specify targets for any stats props, and they'll turn red when they fall below target
         // this does come with a small performance penalty
       }),
