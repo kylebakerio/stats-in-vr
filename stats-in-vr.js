@@ -433,7 +433,7 @@ AFRAME.registerComponent("stats-in-vr", {
           const expectedTime = this.data.throttle*this.samplesRun/1000 // different than predictedTime, because could be stopped earlyer with this.stopSample
 
           this.sampleReport  = `Sample Report:\n`;
-          this.sampleReport += `samples: ${this.samplesRun}\n`
+          this.sampleReport += `samples: ${this.samplesRun} ticks @ ${this.data.throttle}ms throttle\n`
           this.sampleReport += `duration: ${duration} sec (vs. ${expectedTime} sec expected)\n`
           this.sampleReport += `throttle lag: ${Math.round( ((duration-expectedTime) / expectedTime) * 10000)/100}%\n`
           this.sampleReport += `\nstat     | average  | high    | low`
