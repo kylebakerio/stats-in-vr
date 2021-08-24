@@ -1,75 +1,83 @@
 <html>
-
-<head>
-  <title>A-Frame stats-in-vr Component - Basic</title>
-  <script src="../build.js"></script>
-  <link crossorigin="anonymous" media="all" rel="stylesheet" href="../style.css">
-  <script
-    src="https://unpkg.com/aframe-text-geometry-component@0.5.1/dist/aframe-text-geometry-component.min.js"></script>
-</head>
-
-<body>
-  <a-scene debug stats-in-vr="position:0 -0.9 -0.5; scale:1 1 1">
-    <a-assets>
-      <img id="pink" src="https://img.gs/bbdkhfbzkk/stretch/http://i.imgur.com/1hyyIUi.jpg" crossorigin="anonymous" />
-      <img src="https://img.gs/bbdkhfbzkk/stretch/https://i.imgur.com/25P1geh.png" id="grid" crossorigin="anonymous">
-      <img src="https://img.gs/bbdkhfbzkk/2048x1024,stretch/http://i.imgur.com/WMNH2OF.jpg" id="chrome"
-        crossorigin="anonymous">
-      <img id="sky" src="https://img.gs/bbdkhfbzkk/2048x2048,stretch/http://i.imgur.com/WqlqEkq.jpg"
-        crossorigin="anonymous" />
-      <a-asset-item id="dawningFont"
-        src="https://cdn.glitch.com/c719c986-c0c5-48b8-967c-3cd8b8aa17f3%2FdawningOfANewDayRegular.typeface.json?1490305922844">
-      </a-asset-item>
-      <a-asset-item id="exoFont"
-        src="https://cdn.glitch.com/c719c986-c0c5-48b8-967c-3cd8b8aa17f3%2Fexo2Black.typeface.json?1490305922150">
-      </a-asset-item>
-      <a-asset-item id="exoItalicFont"
-        src="https://cdn.glitch.com/c719c986-c0c5-48b8-967c-3cd8b8aa17f3%2Fexo2BlackItalic.typeface.json?1490305922725">
-      </a-asset-item>
-    </a-assets>
+  <head>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     
+    <script src="https://cdn.jsdelivr.net/gh/kylebakerio/stats-in-vr@1.4.0/stats-in-vr.js"></script>
 
-    <a-entity scale="2 2 2" geometry="primitive: torusKnot" position="0 6 -10"
-      material="color: magenta; metalness:1; roughness: 0.1; sphericalEnvMap: #sky;">
-      <a-animation easing="linear" attribute="rotation" dur="10000" to="0 0 360" repeat="indefinite"></a-animation>
-    </a-entity>
+    <script src="https://cdn.jsdelivr.net/npm/a-super-sky@1.0.0/super-sky.js"></script>
+    
+    <!-- (just to add joystick movement to the demo) -->
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.js"></script> 
 
-    <a-entity position="-3 1 -6" rotation="5 0 0">
-      <a-entity rotation="0 0 5" position="0 2 0.2"
-        text-geometry="value: Virtual Reality; font: #dawningFont; bevelEnabled: true; bevelSize: 0.05; bevelThickness: 0.05; curveSegments: 12; size: 1; height: 0;"
-        material="color:lavenderblush; metalness:1; roughness: 0; sphericalEnvMap: #pink;"></a-entity>
-        <a-entity position="-0.5 0.5 -0.5" scale="0.6 1.2 1" text-geometry="value: VAPORWAVE; font: #exoFont; bevelEnabled: true; bevelSize: 0.1; bevelThickness: 0.1; curveSegments: 1; size: 1.5; height: 0.5;" material="color:pink; metalness:0.9; roughness: 0.05; sphericalEnvMap: #chrome;"></a-entity>
-
-        <a-entity position="1 0 0.3" text-geometry="value: Aesthetic; font: #exoItalicFont; style: italic; size: 0.8; weight: bold; height: 0;"
-                  material="shader: flat; color: white"></a-entity>
-        <a-entity position="1 0 0.3" text-geometry="value: Aesthetic; font: #exoItalicFont; style: italic; size: 0.8; weight: bold; height: 0; bevelEnabled: true; bevelSize: 0.04; bevelThickness: 0.04; curveSegments: 1"
-                  material="shader: flat; color: white; transparent: true; opacity: 0.4"></a-entity>
+  </head>
+  <body>
+    <!-- some other possible random settings: -->
+  <!-- 
+  ='debug:true; anchorel:#the-box; position:0 .4 0; showlabels: fps,raf; showgraphs:fps,raf; alwaysshow3dstats:true; show2dstats:false; debug:true; throttle:100; backgroundcolor:orange;' 
+  -->
+    <!-- here we're attaching it to the user's controller, remove anchorel and position if you want it attached to user's head. We've also set custom targets here. -->
+    <a-scene stats-in-vr='anchorel:#right-hand; position:0 -.5 0; targetMin:{"fps":59};targetMax:{"raf":30};'>
+      <a-entity id="rig" movement-controls="fly:true;" position="0 0 0">
+        
+        <a-entity camera id="the-cam"position="0 1.6 0"look-controls="pointerLockEnabled: false"> </a-entity>
+        
+        <!-- here we set it so that left hand triggers sample recording and report, right hand toggles stats being brought up/down -->
+        <a-entity sample-on-event id="left-hand" hand-controls="hand: left"></a-entity>
+        <a-entity stats-on-event id="right-hand" hand-controls="hand: right"></a-entity>
       </a-entity>
-      <a-entity geometry="primitive: plane; width: 10000; height: 10000;" rotation="-90 0 0"
-        material="src: #grid; repeat: 10000 10000; transparent: true;metalness:0.6; roughness: 0.4; sphericalEnvMap: #sky;">
-      </a-entity>
 
-      <a-entity light="color: #ccccff; intensity: 1; type: ambient;" visible=""></a-entity>
-      <a-entity light="color: ffaaff; intensity: 1.5" position="5 5 5"></a-entity>
-      <a-entity light="color: white; intensity: 0.5" position="-5 5 15"></a-entity>
-      <a-entity light="color: white; type: ambient;"></a-entity>
+      <!-- now some stuff thrown into the scene -->
+      <a-super-sky orbitduration=".5"></a-super-sky>
+      <a-box id="the-box" shadow position="-1 0.5 -6" rotation="0 45 0" color="white"></a-box>
+      <a-entity 
+        geometry="primitive:torusKnot; radius:.75;" 
+        shadow 
+        position="0 1.4 -8" 
+        material="color:#5c9aff"  
+        animation="
+          property: rotation;
+          loop: true; 
+          dur: 6000; 
+          from: 0 0 0;
+          to:0 360 0;
+          easing:easeInQuad;
+          dir:alternate
+      "></a-entity>
+      <a-entity 
+        geometry="primitive:icosahedron; radius:1;" 
+        shadow 
+        material="color:#de0ee1" 
+        animation="
+          property: rotation;
+          loop: true; 
+          dur: 12000; 
+          from: 0 0 0;
+          to:0 360 0;
+          easing:easeInQuad;
+          dir:alternate
+      "               
+        animation__2="
+          property: position;
+          loop: true; 
+          dur: 14000; 
+          from: 1 0.75 -6;
+          to: 1 1.75 -3;
+          easing:easeInQuad;
+          dir:alternate
+      "></a-entity>
 
-      <a-sky src="#sky" rotation="0 -90 0"></a-sky>
-  </a-scene>
-
-  <!-- GitHub Corner. -->
-  <a href="https://github.com/chenzlabs/stats-in-vr" class="github-corner">
-    <svg width="80" height="80" viewBox="0 0 250 250"
-      style="fill:#222; color:#fff; position: absolute; top: 0; border: 0; right: 0;">
-      <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
-      <path
-        d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
-        fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
-      <path
-        d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
-        fill="currentColor" class="octo-body"></path>
-    </svg>
-  </a>
-</body>
-
+      <a-circle 
+         id="floor" 
+         material="roughness:.633" 
+         shadow="receive:true; cast:false" 
+         position="0 0 0"
+         rotation="-90 0 0" 
+         radius="400"
+                side="double"
+         color="#7BC8A4">
+      </a-circle>
+      <a-ocean position="0 0 0" color="#92E2E2" width="25" depth="25" density="15" speed="5" shadow="receive:true;"> </a-ocean>
+      
+    </a-scene>
+  </body>
 </html>
