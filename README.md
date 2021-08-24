@@ -22,7 +22,7 @@ I've wanted this for a while, but I googled, found this, and then found a librar
 
 You can access it through jsdelivr's cdn here: https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@1.4.0/vr-super-stats.js
 
-![stats-in-vr](https://user-images.githubusercontent.com/6391152/130007970-a512c190-0a4e-4f0d-8c40-0d8e1e9e58e8.png)
+![vr-super-stats](https://user-images.githubusercontent.com/6391152/130007970-a512c190-0a4e-4f0d-8c40-0d8e1e9e58e8.png)
 ![orange](https://user-images.githubusercontent.com/6391152/130179324-d68f276d-1ccf-4f7c-90fc-1a872bb4fe61.png)
 ![some-graphs-only](https://user-images.githubusercontent.com/6391152/130179339-85f94d50-414a-43ae-b9c7-53304a245921.png)
 ![allgraphs-opacity](https://user-images.githubusercontent.com/6391152/130179350-8eac1d93-beda-4175-aa1b-7d6ecb829e61.png)
@@ -53,42 +53,42 @@ Install and use by directly including the [browser file](https://cdn.jsdelivr.ne
 ### default behavior:
 when you enter VR, full stats get attached to your face, about half a meter down and forward from you. When you are not in VR, you see the normal 2d stats.
 ```html
-<a-scene stats-in-vr></a-scene>
+<a-scene vr-super-stats></a-scene>
 ```
 
 ### just want fps and triangles and raf, and graphs for only the first two
 ```html
-<a-scene stats-in-vr="showlabels:fps,raf,triangles; showgraphs:fps,raf"></a-scene>
+<a-scene vr-super-stats="showlabels:fps,raf,triangles; showgraphs:fps,raf"></a-scene>
 ```
 
 ### no graphs, just numbers please
 takes up less space and reduces overhead
 ```html
-<a-scene stats-in-vr="showgraphs:null;"></a-scene>
+<a-scene vr-super-stats="showgraphs:null;"></a-scene>
 ```
 
 ### high performance mode defaults?
 bare minimum makes for the lighest tick, producing the purest readings possible
 ```html
-<a-scene stats-in-vr="performancemode:true;"></a-scene>
+<a-scene vr-super-stats="performancemode:true;"></a-scene>
 ```
 
 ### no targets
 improves performance
 ```html
-<a-scene stats-in-vr="targetmax:{};targetmin:{}"></a-scene>
+<a-scene vr-super-stats="targetmax:{};targetmin:{}"></a-scene>
 ```
 
 ### custom targets
 shoot high, or shoot low, based on your platform
 ```html
-<a-scene stats-in-vr='targetmin:{"fps":59};targetmax:{"raf":30}'></a-scene>
+<a-scene vr-super-stats='targetmin:{"fps":59};targetmax:{"raf":30}'></a-scene>
 ```
 
 ### only fps graph, but all numbers
 since all labels and graphs are enabled by default, this overrides this existing graph list
 ```html
-<a-scene stats-in-vr="showgraphs:fps;"></a-scene>
+<a-scene vr-super-stats="showgraphs:fps;"></a-scene>
 ```
 
 ## advanced examples
@@ -96,25 +96,25 @@ since all labels and graphs are enabled by default, this overrides this existing
 ### enable default auto-report (600 ticks after enter-vr, display for 30 seconds before disappearing)
 runs and displays a report on stats collected from 600 ticks
 ```html
-<a-scene stats-in-vr='samplereport:{"autostart":true};'></a-scene>
+<a-scene vr-super-stats='samplereport:{"autostart":true};'></a-scene>
 ```
 
 ### start sampling manually
 ```html
-<a-scene stats-in-vr stats-in-vr></a-scene>
+<a-scene vr-super-stats></a-scene>
 <script>
          // ... at the appropriate moment... 
          const samplesToTake = 200
          const timeToShowResults = 10000
-         document.querySelector('[stats-in-vr]').components['stats-in-vr'].sample(samplesToTake).then(() => {
-            document.querySelector('[stats-in-vr]').components['stats-in-vr'].showSampleCanvas(timeToShowResults)
+         document.querySelector('[vr-super-stats]').components['vr-super-stats'].sample(samplesToTake).then(() => {
+            document.querySelector('[vr-super-stats]').components['vr-super-stats'].showSampleCanvas(timeToShowResults)
          })
 </script>
 ```
 
 ### attach translucent stats to your left hand when you enter vr:
 ```html
-    <a-scene stats-in-vr="anchorel:#left-hand; position:0 -.5 0; backgroundcolor:rgba(255, 255, 255, 0.8);">
+    <a-scene vr-super-stats="anchorel:#left-hand; position:0 -.5 0; backgroundcolor:rgba(255, 255, 255, 0.8);">
       <a-entity id="rig" position="0 0 0">
         <a-camera camera position="0 1.6 0" look-controls></a-camera>
         <a-entity hand-controls="hand: left" id="left-hand"></a-entity>
@@ -125,7 +125,7 @@ runs and displays a report on stats collected from 600 ticks
 
 ### make stats appear on your right controller when you press button on your right controller, run sampling when you press button on left controller
 ```html
-<a-scene stats-in-vr="anchorel:#right-hand; position:0 -.5 0;" >
+<a-scene vr-super-stats="anchorel:#right-hand; position:0 -.5 0;" >
       <a-entity id="rig" position="0 0 0">
         <a-entity camera id="the-cam" position="0 1.6 0"></a-entity>
         <a-entity sample-on-event id="left-hand" hand-controls="hand: left"></a-entity>
@@ -136,14 +136,14 @@ runs and displays a report on stats collected from 600 ticks
 ### make the stats panel a fixed item in your scene's space, remaining there whether in vr or not:
 stick a VR panel somewhere you want in the scene, and make it stay there, whether you're in VR or not.
 ```html
-<a-scene stats-in-vr="anchorel:#the-box;position:0 .4 0; alwaysshow3dstats:true; show2dstats:false;" >
+<a-scene vr-super-stats="anchorel:#the-box;position:0 .4 0; alwaysshow3dstats:true; show2dstats:false;" >
      <a-circle id="floor" rotation="-90 0 0" radius="400" color="#7BC8A4"></a-circle>
      <a-box id="the-box" position="-1 0.5 -6" rotation="0 45 0" color="red"></a-box>
 </a-scene>
 ```
 
 ## Demo
-[Glitch](https://glitch.com/edit/#!/stats-in-vr?path=index.html%3A17%3A30)
+[Glitch workspace](https://glitch.com/edit/#!/vr-super-stats-workspace?path=index.html%3A29%3A79) (May show work-in-progress)
 Or, see the examples in this repo.
 
 ## params
@@ -185,8 +185,8 @@ Or, see the examples in this repo.
         /*
           const ticksToSample = 600;
           const durationToShowVRSampleReport = 20000 // 20 seconds
-          document.querySelector('[stats-in-vr]').components['stats-in-vr'].sample(ticksToSample).then(() => {
-              document.querySelector('[stats-in-vr]').components['stats-in-vr'].showSampleCanvas(durationToShowVRSampleReport)
+          document.querySelector('[vr-super-stats]').components['vr-super-stats'].sample(ticksToSample).then(() => {
+              document.querySelector('[vr-super-stats]').components['vr-super-stats'].showSampleCanvas(durationToShowVRSampleReport)
           })
         */
         delay: 0, // if autostart true, how long after app launch to auto-start sampling
