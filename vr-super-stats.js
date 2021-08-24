@@ -412,6 +412,7 @@ AFRAME.registerComponent("vr-super-stats", {
       console.log('you can end sampling at any time:',`document.querySelector('[vr-super-stats]').components['vr-super-stats'].stopSample = true`)
 
       this.stopSample = true; // kill any currently running sample process
+      this.showSampleCanvas(null, !!"load message", sampleCount) // null: ignored when second var is true
       this.runSample = () => {
         if (this.tv.tickI === 0) this.samplesRun++
 
@@ -428,6 +429,8 @@ AFRAME.registerComponent("vr-super-stats", {
           this.sampleTrack[this.tv.label].total += this.tv.value
           this.sampleTrack[this.tv.label].high = this.sampleTrack[this.tv.label].high > this.tv.value ? this.sampleTrack[this.tv.label].high : this.tv.value
           this.sampleTrack[this.tv.label].low = this.sampleTrack[this.tv.label].low < this.tv.value ? this.sampleTrack[this.tv.label].low : this.tv.value
+          
+          this.showSampleCanvas(null, !!"loading message", sampleCount)
         } else {
           const duration = (Date.now() - this.sampleStart)/1000;
           const expectedTime = this.data.throttle*this.samplesRun/1000 // different than predictedTime, because could be stopped earlyer with this.stopSample
@@ -454,75 +457,106 @@ AFRAME.registerComponent("vr-super-stats", {
     })
   },
   runSample() {}, // dynamically set by calling sample()
-  showSampleCanvas(displayDuration=this.data.samplereport.displayDuration) {
-    const sampleLines = this.sampleReport.split("\n");
+  showSampleCanvas(displayDuration=this.data.samplereport.displayDuration,waiting=false,samplesToRun=null) { // second two options used only for waiting screen
+    const sampleLines = this.sampleReport?.split("\n");
 
     if (!this.sampleCanvas) {
       this.sampleCanvas = document.createElement('canvas');
       this.sampleCanvas.setAttribute("id", "sample-canvas");
       this.sampleCanvas.setAttribute("width", 315);
-      this.sampleCanvas.setAttribute("height", 16* (sampleLines.length));
+      this.sampleCanvas.setAttribute("height", 16* (sampleLines?.length || 1));
       this.sampleCanvas.setAttribute("crossorigin", "anonymous");
+      this.samplectx = this.sampleCanvas.getContext("2d");
       this.canvasParent.appendChild(this.sampleCanvas)
       
       this.sampleImage = document.createElement("a-image");
       this.sampleImage.setAttribute("id", "aframe-sample-text");
       this.sampleImage.setAttribute("position", {x:0, y:1.6, z:0});
       this.sampleImage.setAttribute("width", .396);
-      this.sampleImage.setAttribute("height", .025 * (sampleLines.length));
+      this.sampleImage.setAttribute("height", .025 * (sampleLines?.length || 1));
       this.sampleImage.setAttribute("src", "#" + this.sampleCanvas.id);
       this.statspanel.appendChild(this.sampleImage);
     }
     
-    const ctx = this.sampleCanvas.getContext("2d");
-    
-    ctx.clearRect(0, 0, 315, 16 * (sampleLines.length));
-    ctx.fillStyle = this.data.backgroundcolor;
-    ctx.fillRect(0, 0, 315, 16 * (sampleLines.length));
-    ctx.font = "12px monospace";
-
-    for (let i = 0; i < sampleLines.length; i++) {
-      const potentialLabel = sampleLines[i].trim().split('|')[0];
-      // let labelIndex = null;
-      if (this.rsids.includes(potentialLabel)) {
-        console.log("found label", potentialLabel)
-        // labelIndex = this.rsids.indexOf(potentialLabel);
+    if (waiting) {
+      if (!this.sampleImage.getAttribute('material')?.visible) {
+        if (this.data.debug) console.log("will show waiting message while sampling",displayDuration)
+        this.sampleCanvas.setAttribute("height", 16);
+        this.sampleImage.setAttribute("height", .025);
         
-        ctx.fillText(
-          potentialLabel,
-          2, 15.5 + (15.5*i)
-        );
-      
-        sampleLines[i].split("|").forEach((chunk,x) => {
-          if (x === 0) return
-          const value = chunk;
-
-          ctx.fillStyle = 
-            !this.haveTargets || (!this.data.targetmax[potentialLabel] && !this.data.targetmin[potentialLabel]) ? 
-              "black" :  
-            this.data.targetmax[potentialLabel] ?
-              (value < this.data.targetmax[potentialLabel] ? "green" : "red") :
-              (value > this.data.targetmin[potentialLabel] ? "green" : "red") ;
-          
-          ctx.fillText(chunk, x*(315/4) || 2, 15.5 + (15.5*i))
-          
-        })
-      
+        // this.sampleCanvas.setAttribute("height", 16* (this.trackedvalues.length));
+        // this.sampleImage.setAttribute("height", .025 * (this.trackedvalues.length));
       } else {
-        console.log("not label", potentialLabel)
-        ctx.fillStyle = "black"
-        
-        ctx.fillText(
-          sampleLines[i], 
-          2, 15.5 + (15.5*i)
-        );
+        // console.log("won't set height")
       }
+
+      this.samplectx.clearRect(0, 0, 315, 16);
+      this.samplectx.fillStyle = this.data.backgroundcolor;
+      this.samplectx.fillRect(0, 0, 315 * (this.samplesRun/samplesToRun), 16);
+
+      this.samplectx.font = "12px monospace";      
+      this.samplectx.fillStyle = "black"
+      this.samplectx.fillText(
+        `sampling... ${this.samplesRun}/${samplesToRun}`,
+        2, 15
+      );
+    } else {
+      if (this.data.debug) console.log("will show report")
+      this.sampleCanvas.setAttribute("height", 16* (sampleLines.length));
+      this.sampleImage.setAttribute("height", .025 * (sampleLines.length));
+      
+      this.samplectx.clearRect(0, 0, 315, 16 * (sampleLines.length));
+      this.samplectx.fillStyle = this.data.backgroundcolor;
+      this.samplectx.fillRect(0, 0, 315, 16 * (sampleLines.length));
+      this.samplectx.font = "12px monospace";
+
+      for (let i = 0; i < sampleLines.length; i++) {
+        const potentialLabel = sampleLines[i].trim().split('|')[0];
+        // let labelIndex = null;
+        if (this.rsids.includes(potentialLabel)) {
+          console.log("found label", potentialLabel)
+          // labelIndex = this.rsids.indexOf(potentialLabel);
+
+          this.samplectx.fillStyle = "black"
+          this.samplectx.fillText(
+            potentialLabel,
+            2, 15.5 + (15.5*i)
+          );
+
+          sampleLines[i].split("|").forEach((chunk,x) => {
+            if (x !== 0) {
+              const value = chunk;
+
+              this.samplectx.fillStyle = 
+                !this.haveTargets || (!this.data.targetmax[potentialLabel] && !this.data.targetmin[potentialLabel]) ? 
+                  "black" :  
+                this.data.targetmax[potentialLabel] ?
+                  (value < this.data.targetmax[potentialLabel] ? "green" : "red") :
+                  (value > this.data.targetmin[potentialLabel] ? "green" : "red") ;
+
+              console.log(chunk,this.samplectx.fillStyle)
+              this.samplectx.fillText(chunk, x*(315/4) || 2, 15.5 + (15.5*i))
+            }
+
+          })
+        } else {
+          console.log("not label", potentialLabel)
+          this.samplectx.fillStyle = "black"
+
+          this.samplectx.fillText(
+            sampleLines[i], 
+            2, 15.5 + (15.5*i)
+          );
+        }
+      }
+      
+      setTimeout(this.hideSampleCanvas.bind(this), displayDuration);
     }
-    
     this.sampleImage.setAttribute('material','visible','true');
-    setTimeout(this.hideSampleCanvas.bind(this), displayDuration);
+    
   },
   hideSampleCanvas() {
+    if (this.data.debug) console.warn("will hide sample report canvas")
     this.sampleImage.setAttribute('material','visible','false')
   },
   
