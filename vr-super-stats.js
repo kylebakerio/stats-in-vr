@@ -563,7 +563,6 @@ AFRAME.registerComponent("vr-super-stats", {
           );
         }
       }
-      
       this.sampleCanvasHideTimeout = setTimeout(this.hideSampleCanvas.bind(this), displayDuration);
     }
     this.sampleImage.setAttribute('material','visible','true');
