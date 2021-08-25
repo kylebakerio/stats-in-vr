@@ -76,8 +76,10 @@ AFRAME.registerComponent("vr-super-stats", {
         samples: 200, // if autostart true, how many samples to take
         displayDuration: 30000, // how long to leave report up in VR before auto-closing
       }),
-      parse: json => {
-        return typeof json === "string" ? JSON.parse(json) : json; 
+      parse(json) {
+        let output = typeof json === "string" ? JSON.parse(json) : json; 
+        output = {...JSON.parse(this.default), ...output}
+        return output
       },
       stringify: JSON.stringify
     },
@@ -526,7 +528,7 @@ AFRAME.registerComponent("vr-super-stats", {
         const potentialLabel = sampleLines[i].trim().split('|')[0];
         // let labelIndex = null;
         if (this.rsids.includes(potentialLabel)) {
-          console.log("found label", potentialLabel)
+          // console.log("found label", potentialLabel)
           // labelIndex = this.rsids.indexOf(potentialLabel);
 
           this.samplectx.fillStyle = "black"
@@ -546,13 +548,13 @@ AFRAME.registerComponent("vr-super-stats", {
                   (value < this.data.targetmax[potentialLabel] ? "green" : "red") :
                   (value > this.data.targetmin[potentialLabel] ? "green" : "red") ;
 
-              console.log(chunk,this.samplectx.fillStyle)
+              // console.log(chunk,this.samplectx.fillStyle)
               this.samplectx.fillText(chunk, x*(315/4) || 2, 15.5 + (15.5*i))
             }
 
           })
         } else {
-          console.log("not label", potentialLabel)
+          // console.log("not label", potentialLabel)
           this.samplectx.fillStyle = "black"
 
           this.samplectx.fillText(
