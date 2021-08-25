@@ -31,7 +31,7 @@ See fps, raf, triangles, draw cals, points, etc. counts live while in VR. Also m
 
 I've wanted this for a while, but I googled, found this, and then found a library that used to do what I wanted 5 years ago (and hadn't been touched since) in an older version of A-Frame. I've spent some time--arguably too much time--almost completely rewriting it, improving it, making it faster, lighter, and adding features.
 
-You can access it through jsdelivr's cdn here: https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@1.4.1/vr-super-stats.js
+You can access it through jsdelivr's cdn here: https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@1.4.2/vr-super-stats.js
 
 ![vr-super-stats](https://user-images.githubusercontent.com/6391152/130007970-a512c190-0a4e-4f0d-8c40-0d8e1e9e58e8.png)
 ![orange](https://user-images.githubusercontent.com/6391152/130179324-d68f276d-1ccf-4f7c-90fc-1a872bb4fe61.png)
@@ -44,13 +44,13 @@ You can access it through jsdelivr's cdn here: https://cdn.jsdelivr.net/gh/kyleb
 
 #### Browser
 
-Install and use by directly including the [browser file](https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@1.4.1/vr-super-stats.js):
+Install and use by directly including the [browser file](https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@1.4.2/vr-super-stats.js):
 
 ```html
 <head>
   <title>My A-Frame Scene</title>
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@1.4.1/vr-super-stats.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@1.4.2/vr-super-stats.js"></script>
 </head>
 
 <body>
@@ -87,7 +87,7 @@ bare minimum makes for the lighest tick, producing the purest readings possible
 ### no targets
 improves performance
 ```html
-<a-scene vr-super-stats="targetmax:{};targetmin:{}"></a-scene>
+<a-scene vr-super-stats="notargets:true;"></a-scene>
 ```
 
 ### custom targets
@@ -211,6 +211,9 @@ Or, see the examples in this repo.
       stringify: JSON.stringify
     },
     
+
+    notargets: { type: "boolean", default: false }, // use to remove targets
+  
     // thrown in are some sane defaults. This library is written/expects all stats to be given in lowercase everywhere, they will be uppercased as needed.
     // note that you can only have one or the other defined for a given property; for performance, only one will be checked per property. to maximize performance, set no targets.
     targetmax: {
