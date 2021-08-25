@@ -30,5 +30,5 @@
   "homepage": "https://github.com/kylebakerio/vr-super-stats#readme",
   "devDependencies": {
     "aframe": "^1.0.4"
-  },
+  }
 }
