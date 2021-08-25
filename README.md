@@ -87,7 +87,7 @@ bare minimum makes for the lighest tick, producing the purest readings possible
 ### no targets
 improves performance
 ```html
-<a-scene vr-super-stats="targetmax:{};targetmin:{}"></a-scene>
+<a-scene vr-super-stats="notargets:true;"></a-scene>
 ```
 
 ### custom targets
@@ -211,6 +211,9 @@ Or, see the examples in this repo.
       stringify: JSON.stringify
     },
     
+
+    notargets: { type: "boolean", default: false }, // use to remove targets
+  
     // thrown in are some sane defaults. This library is written/expects all stats to be given in lowercase everywhere, they will be uppercased as needed.
     // note that you can only have one or the other defined for a given property; for performance, only one will be checked per property. to maximize performance, set no targets.
     targetmax: {
