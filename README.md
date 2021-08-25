@@ -1,5 +1,5 @@
 <!-- github -->
-![jsDelivr hits (GitHub)](https://img.shields.io/jsdelivr/gh/hm/kylebakerio/vr-super-stats)
+<!-- ![jsDelivr hits (GitHub)](https://img.shields.io/jsdelivr/gh/hm/kylebakerio/vr-super-stats) -->
 <!-- npm -->
 <!-- [![](https://data.jsdelivr.com/v1/package/npm/a-super-sky/badge)](https://www.jsdelivr.com/package/npm/a-super-sky) -->
 
