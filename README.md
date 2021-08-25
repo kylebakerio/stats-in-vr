@@ -205,8 +205,10 @@ Or, see the examples in this repo.
         samples: 200, // if autostart true, how many samples to take
         displayDuration: 30000, // how long to leave report up in VR before auto-closing
       }),
-      parse: json => {
-        return typeof json === "string" ? JSON.parse(json) : json; 
+      parse(json) {
+        let output = typeof json === "string" ? JSON.parse(json) : json; 
+        output = {...JSON.parse(this.default), ...output}
+        return output
       },
       stringify: JSON.stringify
     },
