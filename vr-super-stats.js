@@ -82,6 +82,8 @@ AFRAME.registerComponent("vr-super-stats", {
       stringify: JSON.stringify
     },
     
+
+    notargets: { type: "boolean", default: false },
     // thrown in are some sane defaults. This library is written/expects all stats to be given in lowercase everywhere, they will be uppercased as needed.
     // note that you can only have one or the other defined for a given property; for performance, only one will be checked per property. to maximize performance, set no targets.
     targetmax: {
@@ -144,7 +146,7 @@ AFRAME.registerComponent("vr-super-stats", {
       console.warn("init vr-super-stats")
     }
     
-    this.haveTargets = !!(Object.keys(this.data.targetmax).length + Object.keys(this.data.targetmin).length)
+    this.haveTargets = !this.data.notargets && !!(Object.keys(this.data.targetmax).length + Object.keys(this.data.targetmin).length)
     this.canvasParent = document.createElement('div');
     this.canvasParent.setAttribute('id','vr-super-stats-canvas-parent')
     this.sceneEl = AFRAME.scenes[0]
@@ -156,6 +158,8 @@ AFRAME.registerComponent("vr-super-stats", {
       this.data.show2dstats = false
       this.data.color = "white"
       this.data.targets = {}
+      this.data.notargets = true
+      this.haveTargets = false
     }
 
     AFRAME.scenes[0].addEventListener('enter-vr', async () => {
