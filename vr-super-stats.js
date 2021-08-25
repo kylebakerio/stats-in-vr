@@ -464,6 +464,8 @@ AFRAME.registerComponent("vr-super-stats", {
   },
   runSample() {}, // dynamically set by calling sample()
   showSampleCanvas(displayDuration=this.data.samplereport.displayDuration,waiting=false,samplesToRun=null) { // second two options used only for waiting screen
+    clearInterval(this.sampleCanvasHideTimeout); // if there's already a canvas showing (we started and finished recording while prior result were already displaying), we need to cancel the 'hide' timeout from that one and restart it now.
+    
     const sampleLines = this.sampleReport?.split("\n");
 
     if (!this.sampleCanvas) {
@@ -556,7 +558,7 @@ AFRAME.registerComponent("vr-super-stats", {
         }
       }
       
-      setTimeout(this.hideSampleCanvas.bind(this), displayDuration);
+      this.sampleCanvasHideTimeout = setTimeout(this.hideSampleCanvas.bind(this), displayDuration);
     }
     this.sampleImage.setAttribute('material','visible','true');
     
