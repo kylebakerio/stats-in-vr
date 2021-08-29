@@ -54,7 +54,7 @@ Install and use by directly including the [browser file](https://cdn.jsdelivr.ne
 </head>
 
 <body>
-  <a-scene vr-super-statsr></a-scene>
+  <a-scene vr-super-stats></a-scene>
 </body>
 ```
 
