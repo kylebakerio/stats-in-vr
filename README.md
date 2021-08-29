@@ -1,7 +1,7 @@
 <!-- github -->
-<!-- ![jsDelivr hits (GitHub)](https://img.shields.io/jsdelivr/gh/hm/kylebakerio/vr-super-stats) -->
+![jsDelivr hits (GitHub)](https://img.shields.io/jsdelivr/gh/hm/kylebakerio/vr-super-stats)
 <!-- npm -->
-<!-- [![](https://data.jsdelivr.com/v1/package/npm/a-super-sky/badge)](https://www.jsdelivr.com/package/npm/a-super-sky) -->
+<!-- [![](https://data.jsdelivr.com/v1/package/npm/vr-super-stats/badge)](https://www.jsdelivr.com/package/npm/vr-super-stats) -->
 
 # vr-super-stats
 See fps, raf, triangles, draw cals, points, etc. counts live while in VR. Also measure averages and generate reports programatically.
