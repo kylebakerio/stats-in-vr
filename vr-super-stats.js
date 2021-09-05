@@ -89,7 +89,7 @@ AFRAME.registerComponent("vr-super-stats", {
     // thrown in are some sane defaults. This library is written/expects all stats to be given in lowercase everywhere, they will be uppercased as needed.
     // note that you can only have one or the other defined for a given property; for performance, only one will be checked per property. to maximize performance, set no targets.
     targetmax: {
-      default: JSON.stringify({
+      default: {
         calls: 200, // too many draw calls kills responsiveness
         raf: 15, // needed to keep responsiveness around 60fps
         triangles: 100000, // rough limit for mobile experiences to be smooth
@@ -98,7 +98,7 @@ AFRAME.registerComponent("vr-super-stats", {
         entities: 200, // unsure, I'm more familiar with draw calls, suggested improved number here welcome
         // you can specify your own targets for any stats props, and they'll turn red when they rise above target
         // this does come with a small performance penalty
-      }),
+      },
       capLabels: ['geometries','programs','textures','calls','triangles','points','entities','load'], // these props are auto-uppercased once for faster processing in tick handler
       parse: json => {
         const output = typeof json === "string" ? JSON.parse(json) : json; 
@@ -115,11 +115,11 @@ AFRAME.registerComponent("vr-super-stats", {
       stringify: JSON.stringify
     },
     targetmin: {// inverse of targetmax, for values where lower is better
-      default: JSON.stringify({
+      default: {
         fps: 60, // phones cap at 60, quest 1 aimed for 75 under ideal conditions. quest2 can do 90+ even in A-Frame if you set <a-scene renderer="highRefreshRate:true;">. 60 is minimum to be featured on oculus, 72+ is recommended.
         // you can specify targets for any stats props, and they'll turn red when they fall below target
         // this does come with a small performance penalty
-      }),
+      },
       capLabels: ['geometries','programs','textures','calls','triangles','points','entities','load'], // these props are auto-uppercased once for faster processing in tick handler
       parse: json => {
         const output = typeof json === "string" ? JSON.parse(json) : json; 
@@ -143,26 +143,48 @@ AFRAME.registerComponent("vr-super-stats", {
     this.update()
   },
   inVR: false,
+  isDefault(prop){
+    let result = this.schema[prop].default === this.data[prop];
+    if (Array.isArray(this.schema[prop].default) && Array.isArray(this.data[prop])) {
+      result = !this.schema[prop].default.some((el,i) => {
+        return this.data[prop][i] !== el
+      })
+    }
+    else if (typeof this.schema[prop].default === 'object' && this.schema[prop].default !== null) {
+      result = !Object.keys(this.schema[prop].default).some((key) => {
+        console.log('compare', this.data[prop][key],this.schema[prop].default[key])
+        return this.data[prop][key] !== this.schema[prop].default[key]
+      })
+    }
+    if (!this.data.debug) {
+      // don't log
+    } else if (!result) {
+      console.log("non-default val for",prop, this.schema[prop].default,'is default, vs actual',this.data[prop])
+    } else {
+      console.log('default for',prop)
+    }
+    return result
+  },
   init: function() {
     if (this.data.debug) {
       console.warn("init vr-super-stats")
     }
     
-    this.haveTargets = !this.data.notargets && !!(Object.keys(this.data.targetmax).length + Object.keys(this.data.targetmin).length)
     this.canvasParent = document.createElement('div');
     this.canvasParent.setAttribute('id','vr-super-stats-canvas-parent')
     this.sceneEl = AFRAME.scenes[0]
     
     if (this.data.performancemode) {
       if (this.data.debug) console.warn("performance mode enabled, setting throttle, hiding graphs and 2d stats, setting solid gray background, setting no targets; debug is on, it is recommended that you turn it off, as logs have a performance cost")
-      this.data.throttle = 250
-      this.data.showgraphs = []
-      this.data.show2dstats = false
-      this.data.color = "white"
-      this.data.targets = {}
-      this.data.notargets = true
-      this.haveTargets = false
+      this.data.throttle = this.isDefault('throttle') ? 250 : this.data.throttle
+      this.data.showgraphs = this.isDefault('showgraphs') ? [] : this.data.showgraphs
+      this.data.show2dstats = this.isDefault('show2dstats') ? false : this.data.show2dstats
+      this.data.backgroundcolor = this.isDefault('backgroundcolor') ? "white" : this.data.backgroundcolor
+      this.data.targetmax = this.isDefault('targetmax') ? {} : this.data.targetmax
+      this.data.targetmin = this.isDefault('targetmin') ? {} : this.data.targetmin
     }
+    
+    this.haveTargets = !this.data.notargets && !!(Object.keys(this.data.targetmax).length + Object.keys(this.data.targetmin).length)
 
     AFRAME.scenes[0].addEventListener('enter-vr', async () => {
       this.inVR = true;
