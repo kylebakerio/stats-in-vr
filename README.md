@@ -75,7 +75,7 @@ takes up less space and reduces overhead
 ```
 
 ### high performance mode defaults?
-bare minimum makes for the lighest tick, producing the purest readings possible
+bare minimum makes for the lighest tick, producing the purest readings possible. with the new update, you can also add any other settings, and you'll just override the performance defaults selected while still getting the remaining features culled for your benefit.
 ```html
 <a-scene vr-super-stats="performancemode:true;"></a-scene>
 ```
