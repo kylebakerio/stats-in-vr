@@ -6,8 +6,7 @@
 # vr-super-stats
 See fps, raf, triangles, draw cals, points, etc. counts live while in VR. Also measure averages and generate reports programatically.
 
-![loading-bar](https://user-images.githubusercontent.com/6391152/130669882-2c535623-1fdd-4464-8b75-3feb97cc01b9.png)
-![sample-report-3](https://user-images.githubusercontent.com/6391152/130512748-a3dcea0c-38ff-4744-bf9a-54c23f3d85e5.png)
+<img src="https://user-images.githubusercontent.com/6391152/130669882-2c535623-1fdd-4464-8b75-3feb97cc01b9.png" width="500"><img src="https://user-images.githubusercontent.com/6391152/130512748-a3dcea0c-38ff-4744-bf9a-54c23f3d85e5.png" width="400">
 
 <a href='https://ko-fi.com/kylev' target='_blank'><img height='35' style='border:0px;height:46px;' src='https://az743702.vo.msecnd.net/cdn/kofi3.png?v=0' border='0' alt='Buy Me a Coffee at ko-fi.com' /><a/>
   
@@ -33,12 +32,10 @@ I've wanted this for a while, but I googled, found this, and then found a librar
 
 You can access it through jsdelivr's cdn here: https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@1.4.3/vr-super-stats.js
 
-![vr-super-stats](https://user-images.githubusercontent.com/6391152/130007970-a512c190-0a4e-4f0d-8c40-0d8e1e9e58e8.png)
-![orange](https://user-images.githubusercontent.com/6391152/130179324-d68f276d-1ccf-4f7c-90fc-1a872bb4fe61.png)
-![some-graphs-only](https://user-images.githubusercontent.com/6391152/130179339-85f94d50-414a-43ae-b9c7-53304a245921.png)
-![allgraphs-opacity](https://user-images.githubusercontent.com/6391152/130179350-8eac1d93-beda-4175-aa1b-7d6ecb829e61.png)
-![sample-report-2](https://user-images.githubusercontent.com/6391152/130513640-53b73d1c-ff60-40fb-94c4-0a5d014c9d46.png)
-
+<img src="https://user-images.githubusercontent.com/6391152/130007970-a512c190-0a4e-4f0d-8c40-0d8e1e9e58e8.png" width="256"><img src="https://user-images.githubusercontent.com/6391152/130179324-d68f276d-1ccf-4f7c-90fc-1a872bb4fe61.png" width="256">
+<img src="https://user-images.githubusercontent.com/6391152/130179339-85f94d50-414a-43ae-b9c7-53304a245921.png" width="256">
+<img src="https://user-images.githubusercontent.com/6391152/130179350-8eac1d93-beda-4175-aa1b-7d6ecb829e61.png" width="256">
+<img src="https://user-images.githubusercontent.com/6391152/130513640-53b73d1c-ff60-40fb-94c4-0a5d014c9d46.png" width="256">
 
 ## Installation
 
@@ -268,5 +265,13 @@ Or, see the examples in this repo.
   },
 ```
 
+# performance impact?
+I haven't tried to measure the impact not having it at all makes, but here's an example of measuring the impact of all features enabled and default throttle=50, vs just setting 'high performance mode', in the default demo scene, with default sample of 200 ticks:
 
+![max](https://user-images.githubusercontent.com/6391152/132111876-a25eb56a-1c1a-4efd-9684-4a052fa9286c.png)
+![min](https://user-images.githubusercontent.com/6391152/132111877-2c5a86ed-a78d-4481-b465-c187d95d4c62.png)
 
+in other words, about 20fps in this scene! I've done prelim testing and been a bit surprised by what factors had the biggest impact on this number, but need to sit down and record them more thoroughly at some point here. In the meantime, feel free to run your own tests by remixing the demo and playing with the features there.
+
+# what's next?
+The biggest improvement would come, I think, from importing the rstats code itself, and skipping its render to html step, which would enable us to skip our pulling from html step, and get raw numbers. If anyone wants to pull request this, happy to receive it. Doing this would likely completely remove the loss from parse those numbers from text into Number values to measure targets, and would also enable far more performant (and useful--the default graphs are not very applicable to VR and not customizable) graph options. It could also mean removing calculations that aren't needed at a deeper level, further improving optimization.
