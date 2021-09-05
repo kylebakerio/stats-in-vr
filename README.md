@@ -150,7 +150,7 @@ stick a VR panel somewhere you want in the scene, and make it stay there, whethe
 ```
 
 ## Demo
-[Glitch workspace](https://glitch.com/edit/#!/vr-super-stats-workspace?path=index.html%3A29%3A79) (May show work-in-progress)
+[Glitch workspace](https://glitch.com/edit/#!/vr-super-stats) (May show work-in-progress)
 Or, see the examples in this repo.
 
 ## params
