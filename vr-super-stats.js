@@ -93,7 +93,7 @@ AFRAME.registerComponent("vr-super-stats", {
         calls: 200, // too many draw calls kills responsiveness
         raf: 15, // needed to keep responsiveness around 60fps
         triangles: 100000, // rough limit for mobile experiences to be smooth
-        "load time": 3000, // subjective
+        "load time": 4000, // this is the minimum requirement to be featured on the oculus quest homepage
         points: 15000, // unsure, I've heard 20000 is a drag, but likely lower than that
         entities: 200, // unsure, I'm more familiar with draw calls, suggested improved number here welcome
         // you can specify your own targets for any stats props, and they'll turn red when they rise above target
@@ -116,7 +116,7 @@ AFRAME.registerComponent("vr-super-stats", {
     },
     targetmin: {// inverse of targetmax, for values where lower is better
       default: JSON.stringify({
-        fps: 75, // phones cap at 60, quest 1 aimed for 75.
+        fps: 60, // phones cap at 60, quest 1 aimed for 75 under ideal conditions. quest2 can do 90+ even in A-Frame if you set <a-scene renderer="highRefreshRate:true;">. 60 is minimum to be featured on oculus, 72+ is recommended.
         // you can specify targets for any stats props, and they'll turn red when they fall below target
         // this does come with a small performance penalty
       }),
