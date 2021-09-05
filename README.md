@@ -2,6 +2,7 @@
 ![jsDelivr hits (GitHub)](https://img.shields.io/jsdelivr/gh/hm/kylebakerio/vr-super-stats)
 <!-- npm -->
 <!-- [![](https://data.jsdelivr.com/v1/package/npm/vr-super-stats/badge)](https://www.jsdelivr.com/package/npm/vr-super-stats) -->
+_note: if you're seeing this on npm, it is recommended that you go see github for latest release. npm release may be rarely updated in comparison to github release._
 
 # vr-super-stats
 See fps, raf, triangles, draw cals, points, etc. counts live while in VR. Also measure averages and generate reports programatically.
@@ -30,8 +31,6 @@ See fps, raf, triangles, draw cals, points, etc. counts live while in VR. Also m
 
 I've wanted this for a while, but I googled, found this, and then found a library that used to do what I wanted 5 years ago (and hadn't been touched since) in an older version of A-Frame. I've spent some time--arguably too much time--almost completely rewriting it, improving it, making it faster, lighter, and adding features.
 
-You can access it through jsdelivr's cdn here: https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@1.4.3/vr-super-stats.js
-
 <img src="https://user-images.githubusercontent.com/6391152/130007970-a512c190-0a4e-4f0d-8c40-0d8e1e9e58e8.png" width="256"><img src="https://user-images.githubusercontent.com/6391152/130179324-d68f276d-1ccf-4f7c-90fc-1a872bb4fe61.png" width="256">
 <img src="https://user-images.githubusercontent.com/6391152/130179339-85f94d50-414a-43ae-b9c7-53304a245921.png" width="256">
 <img src="https://user-images.githubusercontent.com/6391152/130179350-8eac1d93-beda-4175-aa1b-7d6ecb829e61.png" width="256">
@@ -41,13 +40,13 @@ You can access it through jsdelivr's cdn here: https://cdn.jsdelivr.net/gh/kyleb
 
 #### Browser
 
-Install and use by directly including the [browser file](https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@1.4.3/vr-super-stats.js):
+Install and use by directly including the browser file via jsdelivr's cdn:
 
 ```html
 <head>
   <title>My A-Frame Scene</title>
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@1.4.3/vr-super-stats.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@1.5.0/vr-super-stats.js"></script>
 </head>
 
 <body>
