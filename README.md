@@ -81,13 +81,13 @@ bare minimum makes for the lighest tick, producing the purest readings possible.
 ```
 
 ### no targets
-improves performance
+No red/green numbers when above/below min/max threshholds. In some cases may significantly improve performance, because no string -> number coercion needed every tick if you don't need to do an equation on it.
 ```html
 <a-scene vr-super-stats="notargets:true;"></a-scene>
 ```
 
 ### custom targets
-shoot high, or shoot low, based on your platform
+shoot high, or shoot low, based on your platform and app.
 ```html
 <a-scene vr-super-stats='targetmin:{"fps":59};targetmax:{"raf":30}'></a-scene>
 ```
@@ -131,6 +131,7 @@ runs and displays a report on stats collected from 600 ticks
 ```
 
 ### make stats appear on your right controller when you press button on your right controller, run sampling when you press button on left controller
+notice the use of the two supplementary micro-components, `stats-on-event` and `sample-on-event`.
 ```html
 <a-scene vr-super-stats="anchorel:#right-hand; position:0 -.5 0;" >
       <a-entity id="rig" position="0 0 0">
@@ -140,7 +141,7 @@ runs and displays a report on stats collected from 600 ticks
       </a-entity>
 ```
 
-### make the stats panel a fixed item in your scene's space, remaining there whether in vr or not:
+### make the stats panel a fixed item in your scene's space, remaining there whether in vr or not
 stick a VR panel somewhere you want in the scene, and make it stay there, whether you're in VR or not.
 ```html
 <a-scene vr-super-stats="anchorel:#the-box;position:0 .4 0; alwaysshow3dstats:true; show2dstats:false;" >
