@@ -5,6 +5,8 @@
 _note: if you're seeing this on npm, it is recommended that you go see github for latest release. npm release may be rarely updated in comparison to github release._
 
 # vr-super-stats
+**One-line drop in for default functionality.** Huge amount of customizability.
+
 See fps, raf, triangles, draw cals, points, etc. counts live while in VR. Also measure averages and generate reports programatically.
 
 <img src="https://user-images.githubusercontent.com/6391152/130669882-2c535623-1fdd-4464-8b75-3feb97cc01b9.png" width="500"><img src="https://user-images.githubusercontent.com/6391152/130512748-a3dcea0c-38ff-4744-bf9a-54c23f3d85e5.png" width="400">
