@@ -26,7 +26,7 @@ See fps, raf, triangles, draw cals, points, etc. counts live while in VR. Also m
 - set targets for maximum or minimum stats values, which will cause numbers to be red or green accordingly
 - by default, shows all stats and graphs and has some opacity, and some default target values for the major stats
 - if you prefer the lightest weight option instead, just set `performancemode='true;'` and `showlabels:fps,raf;` (or exactly whatever stats you want to track).
-- **track live performance and view in-VR reports on caverage/high/low within sample period at a sample rate you determine**
+- **track live performance and view in-VR reports on average/high/low within sample period at a sample rate you determine**
 - helper components for activating on events (e.g. `buttondown` event from `tracked-controller`)
 
 ## yet another necro component pulled into service
