@@ -13,6 +13,8 @@ See fps, raf, triangles, draw cals, points, etc. counts live while in VR. Also m
 
 <a href='https://ko-fi.com/kylev' target='_blank'><img height='35' style='border:0px;height:46px;' src='https://az743702.vo.msecnd.net/cdn/kofi3.png?v=0' border='0' alt='Buy Me a Coffee at ko-fi.com' /><a/>
   
+_Also check out [a-console](https://github.com/kylebakerio/a-console) to see logs while in-vr!._
+
 # features
 - get stats component data in VR, while you're actually using your app
 - high performance, just one canvas/image draw-call texture for all stats (though each graph is its own canvas/image/draw-call, if you include those)
