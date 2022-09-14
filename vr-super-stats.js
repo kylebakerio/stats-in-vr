@@ -166,8 +166,13 @@ AFRAME.registerComponent("vr-super-stats", {
     }
   },
 
+  debug(level,msgs) {
+    if (this.data.debug) {
+      console[level](...msgs);
+    }
+  },
   toggle() {
-    if (this.data.debug) console.log("toggle enabled to", !this.data.enabled)
+    this.debug('log',["toggle enabled to", !this.data.enabled])
     this.data.enabled = !this.data.enabled;
     this.update()
   },
@@ -181,29 +186,27 @@ AFRAME.registerComponent("vr-super-stats", {
     }
     else if (typeof this.schema[prop].default === 'object' && this.schema[prop].default !== null) {
       result = !Object.keys(this.schema[prop].default).some((key) => {
-        console.log('compare', this.data[prop][key],this.schema[prop].default[key])
+        this.debug('log',['compare', this.data[prop][key],this.schema[prop].default[key]])
         return this.data[prop][key] !== this.schema[prop].default[key]
       })
     }
-    if (!this.data.debug) {
-      // don't log
-    } else if (!result) {
-      console.log("non-default val for",prop, this.schema[prop].default,'is default, vs actual',this.data[prop])
+    if (!result) {
+      this.debug('log',["non-default val for",prop, this.schema[prop].default,'is default, vs actual',this.data[prop]]);
     } else {
-      console.log('default for',prop)
+      this.debug('log',['default for',prop]);
     }
     return result
   },
   
   init: async function initVrSuperStats() {
-    if (this.data.debug) console.warn("init vr-super-stats")
+    this.debug('warn',["init vr-super-stats"])
     
     this.canvasParent = document.createElement('div');
     this.canvasParent.setAttribute('id','vr-super-stats-canvas-parent')
     this.sceneEl = AFRAME.scenes[0]
     
     if (this.data.performancemode) {
-      if (this.data.debug) console.warn("performance mode enabled, setting throttle, hiding graphs and 2d stats, setting solid gray background, setting no targets; debug is on, it is recommended that you turn it off, as logs have a performance cost")
+      this.debug('warn',["performance mode enabled, setting throttle, hiding graphs and 2d stats, setting solid gray background, setting no targets; debug is on, it is recommended that you turn it off, as logs have a performance cost"])
       this.data.throttle = this.isDefault('throttle') ? 250 : this.data.throttle
       this.data.showgraphs = this.isDefault('showgraphs') ? [] : this.data.showgraphs
       this.data.show2dstats = this.isDefault('show2dstats') ? false : this.data.show2dstats
@@ -217,10 +220,10 @@ AFRAME.registerComponent("vr-super-stats", {
     AFRAME.scenes[0].addEventListener('enter-vr', async () => {
       this.inVR = true;
       if (this.data.enabled) {
-        if (this.data.debug) console.log("entered VR, showing stats")
+        this.debug('log', ["entered VR, showing stats"])
         this.show()
         if (this.data.samplereport.autostart) {
-          if (this.data.debug) console.log("will autostart sampleReport")
+          this.debug('log',["will autostart sampleReport"])
           
           setTimeout(() => {
             document.querySelector('[vr-super-stats]').components['vr-super-stats'].sample(this.data.samplereport.samples).then(() => {
@@ -228,24 +231,24 @@ AFRAME.registerComponent("vr-super-stats", {
             })
           },this.data.samplereport.delay)
         }
-      } else if (this.data.debug) {
-        console.warn("vr-super-stats is not enabled")
+      } else {
+        this.debug('warn',['vr-super-stats is not enabled']);
         this.hide()
       }
     })
     AFRAME.scenes[0].addEventListener('exit-vr', async () => {
       this.inVR = false;
       if (!this.data.alwaysshow3dstats) {
-        if (this.data.debug) console.log("hiding VR stats")
+        this.debug('log',["hiding VR stats"]);
         this.hide();
       } else {
-        if (this.data.debug) console.log("persistent 3d stats enabled, won't hide")
+        this.debug('log',["persistent 3d stats enabled, won't hide"]);
         this.show()
       }
     })
     
     if (!this.data.show2dstats) {
-      if (this.data.debug) console.log("hiding 2d stats panel")
+      this.debug('log',["hiding 2d stats panel"]);
       this.sceneEl.components['extra-stats'].statsEl.style = 'display: none !important;';
       this.sceneEl.components['extra-stats'].statsEl.className = 'a-hidden';
     }
@@ -264,7 +267,7 @@ AFRAME.registerComponent("vr-super-stats", {
 
   createStatsPanel: async function() {
     // attached to scene element, so inject stats panel into camera
-    if (this.data.debug) console.log("create stats panel")
+    this.debug('log',["create stats panel"]);
     this.statspanel = document.createElement("a-entity");
     this.statspanel.setAttribute("id", "statspanel");
     this.statspanel.setAttribute("position", this.data.position);
@@ -302,7 +305,7 @@ AFRAME.registerComponent("vr-super-stats", {
   },
   
   setupData: async function() {
-    if (this.data.debug) console.warn("calling setupData")
+    this.debug('warn',["calling setupData"]);
     // method:
     // store stat labels
     // store stat values
@@ -315,7 +318,7 @@ AFRAME.registerComponent("vr-super-stats", {
     if (!this.statspanel) return
     
     if (!document.querySelectorAll(".rs-canvas").length) {
-      if (this.data.debug) console.log("no canvases, recurse in ", 100)
+      this.debug('log',["no canvases, recurse in ", 100]);
       await this.waitForTime(100)
       return await this.setupData()
     }
@@ -347,23 +350,23 @@ AFRAME.registerComponent("vr-super-stats", {
       
       const checkIfTrackedLabel = this.rsid.toLowerCase().split(" ")[0]
       
-      if (this.data.debug) console.log({rsid:checkIfTrackedLabel, idSuffix:this.idsuffix, labelToLowerCase:checkIfTrackedLabel, showThisLabel:this.data.showlabels.includes(checkIfTrackedLabel)})
+      this.debug('log',[{rsid:checkIfTrackedLabel, idSuffix:this.idsuffix, labelToLowerCase:checkIfTrackedLabel, showThisLabel:this.data.showlabels.includes(checkIfTrackedLabel)}]);
       if (this.data.showlabels.includes(checkIfTrackedLabel)) {
-        if (this.data.debug) console.log("include label", i, this.rsid)
+        this.debug('log',["include label", i, this.rsid]);
         this.labelOrder = this.data.showlabels.findIndex(label => checkIfTrackedLabel.includes(label));
         this.trackedvalues[this.labelOrder] = i;
-      } else if (this.data.debug) {
-        console.log("will not show", this.rsid)
+      } else {
+        this.debug('log',["will not show", this.rsid]);
       }
 
       if (this.data.showgraphs.includes(checkIfTrackedLabel)) {
-        if (this.data.debug && !this.data.showlabels.includes(checkIfTrackedLabel)) {
-          console.warn("will not show graph without matching label",this.rsid)
+        if (!this.data.showlabels.includes(checkIfTrackedLabel)) {
+          this.debug('warn',["will not show graph without matching label",this.rsid]);
           continue
         } // else
         this.yval = ( ( (1.25 - (.0125*(this.data.showlabels.length-1))) + ((this.data.showlabels.length-1) * .025) ) - (this.labelOrder * 0.025));
         // this.yval = ( 1.25 + (this.data.showlabels.length * .0125) )
-        if (this.data.debug) console.log("include graph", i, this.trackedvalues.length, this.rsid,this.yval,this.labelOrder)        
+        this.debug('log',["include graph", i, this.trackedvalues.length, this.rsid,this.yval,this.labelOrder]);
         this.stats[i] = document.createElement('a-image'); // aframe VR image that will have the DOM's graph canvas given as texture
         this.stats[i].setAttribute('position', {x:-0.08, y:this.yval, z:0});
         this.stats[i].setAttribute('width', 0.34);
@@ -394,12 +397,10 @@ AFRAME.registerComponent("vr-super-stats", {
 
   update: function(olddata) {
     if (!this.statspanel || !this.trackedvalues) {
-      if (this.data.debug) {
-        console.warn("skip initial update",olddata,this.data)
-      }
+      this.debug('warn',["skip initial update",olddata,this.data])
       return;
     } else {
-      console.warn("non-skipped update",olddata,this.data)
+      this.debug('warn',["non-skipped update",olddata,this.data]);
     }
     this.haveTargets = (this.data.targetlessthan || this.data.targetgreaterthan) && !!Object.keys(this.data.targetlessthan).length || !!Object.keys(this.data.targetgreaterthan).length;
     this.statspanel.setAttribute("position", this.data.position);
@@ -548,7 +549,7 @@ AFRAME.registerComponent("vr-super-stats", {
     
     if (waiting) {
       if (!this.sampleImage.getAttribute('material')?.visible) {
-        if (this.data.debug) console.log("will show waiting message while sampling",displayDuration)
+        this.debug('log',["will show waiting message while sampling",displayDuration]);
         this.sampleCanvas.setAttribute("height", 16);
         this.sampleImage.setAttribute("height", .025);
         
@@ -569,7 +570,7 @@ AFRAME.registerComponent("vr-super-stats", {
         2, 15
       );
     } else {
-      if (this.data.debug) console.log("will show report")
+      this.debug('log',["will show report"]);
       this.sampleCanvas.setAttribute("height", 16* (sampleLines.length));
       this.sampleImage.setAttribute("height", .025 * (sampleLines.length));
       
@@ -623,15 +624,13 @@ AFRAME.registerComponent("vr-super-stats", {
     
   },
   hideSampleCanvas() {
-    if (this.data.debug) console.warn("will hide sample report canvas")
+    this.debug('log',["will hide sample report canvas"]);
     this.sampleImage.setAttribute('material','visible','false')
   },
   
 
   hide: function() {
-    if (this.data.debug) {
-      console.warn("will hide")
-    }
+    this.debug('log',["will hide"]);
     if (this.statspanel) {
       this.statspanel.object3D.visible = false;
     }
@@ -646,11 +645,11 @@ AFRAME.registerComponent("vr-super-stats", {
 
   show: function() {
     if (this.statspanel) {
-      if (this.data.debug) console.log("set as visible")
+      this.debug('log',["set as visible"]);
       this.statspanel.object3D.visible = true;
     }
     else {
-      if (this.data.debug) console.warn("no statspanel to set as visible")
+      this.debug('warn',["no statspanel to set as visible"]);
     }
   }
 });
