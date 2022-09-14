@@ -7,7 +7,7 @@
 AFRAME.registerComponent('sample-on-event',{
   schema: { type: 'string', default: 'buttondown' }, // single property schema: https://aframe.io/docs/1.3.0/core/component.html#single-property-schema
   init() {
-    this.el.addEventListener(this.data.event, function (evt) { 
+    this.el.addEventListener(this.data, function (evt) { 
        document.querySelector('[vr-super-stats]').components['vr-super-stats'].sample().then(() => {
           document.querySelector('[vr-super-stats]').components['vr-super-stats'].showSampleCanvas()
        })
@@ -18,7 +18,7 @@ AFRAME.registerComponent('sample-on-event',{
 AFRAME.registerComponent('stats-on-event',{
   schema: { type: 'string', default: 'buttondown' }, // single property schema: https://aframe.io/docs/1.3.0/core/component.html#single-property-schema
   init() {
-    this.el.addEventListener(this.data.event, function (evt) { 
+    this.el.addEventListener(this.data, function (evt) { 
        document.querySelector('[vr-super-stats]').components['vr-super-stats'].toggle()
     });
   }
