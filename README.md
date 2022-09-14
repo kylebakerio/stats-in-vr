@@ -52,7 +52,7 @@ Install and use by directly including the browser file via jsdelivr's cdn:
   <title>My A-Frame Scene</title>
   <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
   <script src="https://unpkg.com/@fern-solutions/aframe-extra-stats/dist/extra-stats.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@2.0.0/vr-super-stats.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@2.0.1/vr-super-stats.js"></script>
 </head>
 
 <body>
