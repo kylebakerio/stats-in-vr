@@ -5,9 +5,7 @@
  */
  
 AFRAME.registerComponent('sample-on-event',{
-  schema: {
-    event: { type: 'string', default: 'buttondown' },
-  },
+  schema: { type: 'string', default: 'buttondown' }, // single property schema: https://aframe.io/docs/1.3.0/core/component.html#single-property-schema
   init() {
     this.el.addEventListener(this.data.event, function (evt) { 
        document.querySelector('[vr-super-stats]').components['vr-super-stats'].sample().then(() => {
@@ -18,9 +16,7 @@ AFRAME.registerComponent('sample-on-event',{
 });
 
 AFRAME.registerComponent('stats-on-event',{
-  schema: {
-    event: { type: 'string', default: 'buttondown' },
-  },
+  schema: { type: 'string', default: 'buttondown' }, // single property schema: https://aframe.io/docs/1.3.0/core/component.html#single-property-schema
   init() {
     this.el.addEventListener(this.data.event, function (evt) { 
        document.querySelector('[vr-super-stats]').components['vr-super-stats'].toggle()
@@ -28,8 +24,39 @@ AFRAME.registerComponent('stats-on-event',{
   }
 });
 
+// async function loadExtraStats() {
+//   const haveExtraStats = AFRAME.components.hasOwnProperty('extra-stats');
+//   let extraStatsLoadPromise;
+//   if (!haveExtraStats) {
+//     let srcLoadedResolve;
+//     extraStatsLoadPromise = new Promise((resolve, reject) => {
+//       srcLoadedResolve = resolve;
+//     })
+
+//     // add fern's extra-stats for more insight/options
+//     const script = document.createElement('script');
+//     script.type = 'text/javascript';
+//     script.async = true;
+//     script.onload = function() {
+//       srcLoadedResolve();
+//     }
+//     script.src = 'https://unpkg.com/@fern-solutions/aframe-extra-stats/dist/extra-stats.umd.min.js';
+//     try {
+//       document.getElementsByTagName('head')[0].appendChild(script);
+//     } catch (e) {
+//       console.warn("error injecting extra-stats; perhaps you already load extra-stats? will attempt to continue.")
+//       console.warn(e);
+//       srcLoadedResolve();
+//     }
+//   }
+
+//   return extraStatsLoadPromise;
+// }
+
+
+
 AFRAME.registerComponent("vr-super-stats", {
-  dependencies: ["stats"],
+  dependencies: ["extra-stats"],
 
   schema: {
     enabled: { type: "boolean", default: true },
@@ -48,15 +75,17 @@ AFRAME.registerComponent("vr-super-stats", {
     alwaysshow3dstats: { type: "boolean", default: false },  // show this component even when not in VR
     anchorel: { type: "selector", default: "[camera]" }, // anchor in-vr stats to something other than the camera
 
-    showlabels: {type: 'array', default:['raf','fps','geometries','programs','textures','calls','triangles','points','entities','load time']}, // please give all inputs in lowercase
-    showgraphs: {type: 'array', default:['raf','fps','geometries','programs','textures','calls','triangles','points','entities','load time']}, // this will be auto-filtered down to match above, but you can filter down further if you want, say, 4 values in text, but only 1 in graph form. you can also select `null` or `false` or `[]` to turn off all graphs.
+    extraStatsGroups: { type:"string", default: "three: true; aframe: true; three-alloc: true"}, // see: https://github.com/mrxz/fern-aframe-components/tree/main/extra-stats
+    
+    showlabels: {type: 'array', default:['raf','fps','geometries','programs','textures','calls','triangles','points','entities','load','color','matrix4','matrix3','quaternion','vector4','vector3','vector2']}, // please give all inputs in lowercase
+    showgraphs: {type: 'array', default:['raf','fps','geometries','programs','textures','calls','triangles','points','entities','color','matrix4','matrix3','quaternion','vector4','vector3','vector2']}, // this will be auto-filtered down to match above, but you can filter down further if you want, say, 4 values in text, but only 1 in graph form. you can also select `null` or `false` or `[]` to turn off all graphs.
 
     //
     // advanced options:
     // 
-    
-    // targetmax
-    // targetmin
+
+    // targetlessthan
+    // targetgreaterthan
     // samplereport
     // ^ these three are defined below as custom schema options--basically, they take in JSON (if serializing or if defining in HTML, see examples) or straight up JS objects (if adding to scene programatically)    
     
@@ -74,12 +103,12 @@ AFRAME.registerComponent("vr-super-stats", {
         */
         delay: 0, // if autostart true, how long after app launch to auto-start sampling
         samples: 200, // if autostart true, how many samples to take
-        displayDuration: 30000, // how long to leave report up in VR before auto-closing
+        displayDuration: 30000, // how long to leave report up in VR before auto-closing; this is 30 seconds, to read the report and process it before it self-dismisses
       }),
-      parse(json) {
-        let output = typeof json === "string" ? JSON.parse(json) : json; 
-        output = {...JSON.parse(this.default), ...output}
-        return output
+      parse(jsonOrObj) {
+        let output = typeof jsonOrObj === "string" ? JSON.parse(jsonOrObj) : jsonOrObj; 
+        output = {...JSON.parse(this.default), ...output};
+        return output;
       },
       stringify: JSON.stringify
     },
@@ -88,18 +117,18 @@ AFRAME.registerComponent("vr-super-stats", {
     notargets: { type: "boolean", default: false },
     // thrown in are some sane defaults. This library is written/expects all stats to be given in lowercase everywhere, they will be uppercased as needed.
     // note that you can only have one or the other defined for a given property; for performance, only one will be checked per property. to maximize performance, set no targets.
-    targetmax: {
+    targetlessthan: {
       default: {
+        raf: 30, // needed to keep responsiveness around 60fps
         calls: 200, // too many draw calls kills responsiveness
-        raf: 15, // needed to keep responsiveness around 60fps
         triangles: 100000, // rough limit for mobile experiences to be smooth
         "load time": 4000, // this is the minimum requirement to be featured on the oculus quest homepage
-        points: 15000, // unsure, I've heard 20000 is a drag, but likely lower than that
+        points: 15000, // unsure, I've heard 20k is a drag, it's likely lower than that
         entities: 200, // unsure, I'm more familiar with draw calls, suggested improved number here welcome
-        // you can specify your own targets for any stats props, and they'll turn red when they rise above target
+        // you can specify your own targets for any stats props, and they'll turn green when are below target
         // this does come with a small performance penalty
       },
-      capLabels: ['geometries','programs','textures','calls','triangles','points','entities','load'], // these props are auto-uppercased once for faster processing in tick handler
+      capLabels: ['geometries','programs','textures','calls','triangles','points','entities','load','color','matrix4','matrix3','quaternion','vector4','vector3','vector2'], // these props are auto-uppercased once for faster processing in tick handler
       parse: json => {
         const output = typeof json === "string" ? JSON.parse(json) : json; 
         
@@ -114,13 +143,13 @@ AFRAME.registerComponent("vr-super-stats", {
       },
       stringify: JSON.stringify
     },
-    targetmin: {// inverse of targetmax, for values where lower is better
+    targetgreaterthan: {// inverse of targetlessthan, for values where lower is better
       default: {
-        fps: 60, // phones cap at 60, quest 1 aimed for 75 under ideal conditions. quest2 can do 90+ even in A-Frame if you set <a-scene renderer="highRefreshRate:true;">. 60 is minimum to be featured on oculus, 72+ is recommended.
+        fps: 58, // phones cap at 60, quest 1 aimed for 75 under ideal conditions. quest2 can do 90+ even in A-Frame if you set <a-scene renderer="highRefreshRate:true;">. 60 is minimum to be featured on oculus, 72+ is recommended.
         // you can specify targets for any stats props, and they'll turn red when they fall below target
         // this does come with a small performance penalty
       },
-      capLabels: ['geometries','programs','textures','calls','triangles','points','entities','load'], // these props are auto-uppercased once for faster processing in tick handler
+      capLabels: ['geometries','programs','textures','calls','triangles','points','entities','load','color','matrix4','matrix3','quaternion','vector4','vector3','vector2'], // these props are auto-uppercased once for faster processing in tick handler
       parse: json => {
         const output = typeof json === "string" ? JSON.parse(json) : json; 
         
@@ -165,10 +194,9 @@ AFRAME.registerComponent("vr-super-stats", {
     }
     return result
   },
-  init: function() {
-    if (this.data.debug) {
-      console.warn("init vr-super-stats")
-    }
+  
+  init: async function initVrSuperStats() {
+    if (this.data.debug) console.warn("init vr-super-stats")
     
     this.canvasParent = document.createElement('div');
     this.canvasParent.setAttribute('id','vr-super-stats-canvas-parent')
@@ -180,11 +208,11 @@ AFRAME.registerComponent("vr-super-stats", {
       this.data.showgraphs = this.isDefault('showgraphs') ? [] : this.data.showgraphs
       this.data.show2dstats = this.isDefault('show2dstats') ? false : this.data.show2dstats
       this.data.backgroundcolor = this.isDefault('backgroundcolor') ? "white" : this.data.backgroundcolor
-      this.data.targetmax = this.isDefault('targetmax') ? {} : this.data.targetmax
-      this.data.targetmin = this.isDefault('targetmin') ? {} : this.data.targetmin
+      this.data.targetlessthan = this.isDefault('targetlessthan') ? {} : this.data.targetlessthan
+      this.data.targetgreaterthan = this.isDefault('targetgreaterthan') ? {} : this.data.targetgreaterthan
     }
     
-    this.haveTargets = !this.data.notargets && !!(Object.keys(this.data.targetmax).length + Object.keys(this.data.targetmin).length)
+    this.haveTargets = !this.data.notargets && !!(Object.keys(this.data.targetlessthan).length + Object.keys(this.data.targetgreaterthan).length)
 
     AFRAME.scenes[0].addEventListener('enter-vr', async () => {
       this.inVR = true;
@@ -218,8 +246,8 @@ AFRAME.registerComponent("vr-super-stats", {
     
     if (!this.data.show2dstats) {
       if (this.data.debug) console.log("hiding 2d stats panel")
-      this.sceneEl.components.stats.statsEl.style = 'display: none !important;';
-      this.sceneEl.components.stats.statsEl.className = 'a-hidden';
+      this.sceneEl.components['extra-stats'].statsEl.style = 'display: none !important;';
+      this.sceneEl.components['extra-stats'].statsEl.className = 'a-hidden';
     }
 
     this.begin();
@@ -236,6 +264,7 @@ AFRAME.registerComponent("vr-super-stats", {
 
   createStatsPanel: async function() {
     // attached to scene element, so inject stats panel into camera
+    if (this.data.debug) console.log("create stats panel")
     this.statspanel = document.createElement("a-entity");
     this.statspanel.setAttribute("id", "statspanel");
     this.statspanel.setAttribute("position", this.data.position);
@@ -249,7 +278,7 @@ AFRAME.registerComponent("vr-super-stats", {
     
     if (this.data.debug) {
       // put our canvas where it is visible to observe without being put in 3d space, instead of somewhere it can't be seen.
-      this.sceneEl.components.stats.statsEl.appendChild(this.canvasParent);
+      this.sceneEl.components['extra-stats'].statsEl.appendChild(this.canvasParent);
     }
     else {
       document.body.appendChild(this.canvasParent);
@@ -316,19 +345,19 @@ AFRAME.registerComponent("vr-super-stats", {
       this.idsuffix = this.rsids[i].replace(" ", "_");
       this.rscanvases[i].id = "rstats-" + this.idsuffix;
       
-      const checkIfTrackedLabel = this.rsid.toLowerCase()//.split(" ")[0]
+      const checkIfTrackedLabel = this.rsid.toLowerCase().split(" ")[0]
       
-      console.log(this.rsid.toLowerCase(), this.idsuffix, checkIfTrackedLabel, this.data.showlabels.includes(checkIfTrackedLabel))
+      if (this.data.debug) console.log({rsid:checkIfTrackedLabel, idSuffix:this.idsuffix, labelToLowerCase:checkIfTrackedLabel, showThisLabel:this.data.showlabels.includes(checkIfTrackedLabel)})
       if (this.data.showlabels.includes(checkIfTrackedLabel)) {
         if (this.data.debug) console.log("include label", i, this.rsid)
-        this.labelOrder = this.data.showlabels.findIndex(label => this.rsid.toLowerCase().includes(label));
+        this.labelOrder = this.data.showlabels.findIndex(label => checkIfTrackedLabel.includes(label));
         this.trackedvalues[this.labelOrder] = i;
       } else if (this.data.debug) {
         console.log("will not show", this.rsid)
       }
 
-      if (this.data.showgraphs.includes(this.rsid.toLowerCase())) {
-        if (this.data.debug && !this.data.showlabels.includes(this.rsid.toLowerCase())) {
+      if (this.data.showgraphs.includes(checkIfTrackedLabel)) {
+        if (this.data.debug && !this.data.showlabels.includes(checkIfTrackedLabel)) {
           console.warn("will not show graph without matching label",this.rsid)
           continue
         } // else
@@ -365,12 +394,14 @@ AFRAME.registerComponent("vr-super-stats", {
 
   update: function(olddata) {
     if (!this.statspanel || !this.trackedvalues) {
-      console.warn("skip initial update",olddata,this.data)
+      if (this.data.debug) {
+        console.warn("skip initial update",olddata,this.data)
+      }
       return;
     } else {
       console.warn("non-skipped update",olddata,this.data)
     }
-    this.haveTargets = (this.data.targetmax || this.data.targetmin) && !!Object.keys(this.data.targetmax).length || !!Object.keys(this.data.targetmin).length;
+    this.haveTargets = (this.data.targetlessthan || this.data.targetgreaterthan) && !!Object.keys(this.data.targetlessthan).length || !!Object.keys(this.data.targetgreaterthan).length;
     this.statspanel.setAttribute("position", this.data.position);
     this.statspanel.setAttribute("scale", this.data.scale);
     if (this.tick) this.tick = AFRAME.utils.throttleTick(this.willtick, this.data.throttle, this);
@@ -378,7 +409,7 @@ AFRAME.registerComponent("vr-super-stats", {
   },
 
   remove: function() {
-    const statsEl = this.sceneEl.components.stats.statsEl;
+    const statsEl = this.sceneEl.components['extra-stats'].statsEl;
     statsEl.parentNode.removeChild(statsEl); // interesting...?
   },
   
@@ -402,15 +433,16 @@ AFRAME.registerComponent("vr-super-stats", {
       
       for (this.tv.tickI = 0; this.tv.tickI < this.trackedvalues.length; this.tv.tickI++) {
         this.tv.label = this.rsids[this.trackedvalues[this.tv.tickI]];
+        if (!this.tv.label) continue;
         this.tv.value = parseInt(this.rsvalues[this.trackedvalues[this.tv.tickI]].innerText);
         // parseInt is the most performant way to do this, but it would be even better if we could somehow access the raw numbers before they go to HTML. parseInt is about a 60% slowdwon compared to using raw numbers.
         
         this.tickctx.fillStyle = 
-          !this.haveTargets || (!this.data.targetmax[this.tv.label] && !this.data.targetmin[this.tv.label]) ? 
+          !this.haveTargets || (!this.data.targetlessthan[this.tv.label] && !this.data.targetgreaterthan[this.tv.label]) ? 
             "black" :  
-          this.data.targetmax[this.tv.label] ?
-            (this.tv.value < this.data.targetmax[this.tv.label] ? "green" : "red") :
-            (this.tv.value > this.data.targetmin[this.tv.label] ? "green" : "red") ;
+          this.data.targetlessthan[this.tv.label] ?
+            (this.tv.value < this.data.targetlessthan[this.tv.label] ? "green" : "red") :
+            (this.tv.value > this.data.targetgreaterthan[this.tv.label] ? "green" : "red") ;
         
         this.tickctx.fillText(
           `${this.tv.label} ${this.tv.value}`, 
@@ -564,11 +596,11 @@ AFRAME.registerComponent("vr-super-stats", {
               const value = chunk;
 
               this.samplectx.fillStyle = 
-                !this.haveTargets || (!this.data.targetmax[potentialLabel] && !this.data.targetmin[potentialLabel]) ? 
+                !this.haveTargets || (!this.data.targetlessthan[potentialLabel] && !this.data.targetgreaterthan[potentialLabel]) ? 
                   "black" :  
-                this.data.targetmax[potentialLabel] ?
-                  (value < this.data.targetmax[potentialLabel] ? "green" : "red") :
-                  (value > this.data.targetmin[potentialLabel] ? "green" : "red") ;
+                this.data.targetlessthan[potentialLabel] ?
+                  (value < this.data.targetlessthan[potentialLabel] ? "green" : "red") :
+                  (value > this.data.targetgreaterthan[potentialLabel] ? "green" : "red") ;
 
               // console.log(chunk,this.samplectx.fillStyle)
               this.samplectx.fillText(chunk, x*(315/4) || 2, 15.5 + (15.5*i))
@@ -604,17 +636,21 @@ AFRAME.registerComponent("vr-super-stats", {
       this.statspanel.object3D.visible = false;
     }
     if (!this.data.show2dstats) {
-      this.sceneEl.components.stats.statsEl.style = 'display: none !important;';
-      this.sceneEl.components.stats.statsEl.className = 'a-hidden';
+      this.sceneEl.components['extra-stats'].statsEl.style = 'display: none !important;';
+      this.sceneEl.components['extra-stats'].statsEl.className = 'a-hidden';
     } else {
-      this.sceneEl.components.stats.statsEl.classList.remove("a-hidden");
-      this.sceneEl.components.stats.statsEl.style = "";
+      this.sceneEl.components['extra-stats'].statsEl.classList.remove("a-hidden");
+      this.sceneEl.components['extra-stats'].statsEl.style = "";
     }
   },
 
   show: function() {
     if (this.statspanel) {
+      if (this.data.debug) console.log("set as visible")
       this.statspanel.object3D.visible = true;
+    }
+    else {
+      if (this.data.debug) console.warn("no statspanel to set as visible")
     }
   }
 });
